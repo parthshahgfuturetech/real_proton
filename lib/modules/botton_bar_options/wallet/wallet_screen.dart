@@ -1,0 +1,514 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:get/get.dart';
+import 'package:real_proton/main.dart';
+import 'package:real_proton/utils/colors.dart';
+import 'package:real_proton/utils/theme.dart';
+
+import 'transfer_fund__screen/transfer_fund_screen.dart';
+
+class WalletScreen extends StatelessWidget {
+  WalletScreen({super.key});
+
+  final ThemeController themeController = Get.find();
+
+  @override
+  Widget build(BuildContext context) {
+    final isDarkMode = themeController.themeMode.value == ThemeMode.dark ||
+        (themeController.themeMode.value == ThemeMode.system &&
+            MediaQuery.of(context).platformBrightness == Brightness.dark);
+    return Scaffold(
+      body: Obx(
+        () => Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                ColorUtils.dashBoardAppbar1,
+                ColorUtils.dashBoardAppbar2,
+              ],
+            ),
+          ),
+          child: Column(
+            children: [
+              const SizedBox(
+                height: 10,
+              ),
+              buildShowTotalBalance(context, isDarkMode),
+              Container(
+                height: 20,
+                margin: EdgeInsets.symmetric(horizontal: 33),
+                color: const Color.fromRGBO(249, 86, 22, 0.16),
+              ),
+              buildAssetsText(isDarkMode),
+              Expanded(child: buildAssets(isDarkMode)),
+              SizedBox(
+                height:
+                    walletController.isTransactionHistoryShow.value ? 10 : 35,
+              ),
+              if (walletController.isTransactionHistoryShow.value)
+                buildTransactionHistory(isDarkMode)
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget buildAssetsText(bool isDarkMode) {
+    return Container(
+      alignment: Alignment.topLeft,
+      margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+      child: Text(
+        "Assets",
+        style: TextStyle(
+          fontSize: 18,
+          color: isDarkMode ? Colors.white : Colors.black,
+          fontFamily: "Switzer",
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+    );
+  }
+
+  Widget buildTransactionHistory(bool isDarkMode) {
+    return Container(
+      height: 55,
+      padding: const EdgeInsets.symmetric(horizontal: 15),
+      decoration: BoxDecoration(
+          color: isDarkMode
+              ? ColorUtils.transactionHistoryColor
+              : ColorUtils.whiteColor,
+          border: Border.all(
+            color: isDarkMode
+                ? ColorUtils.appbarHorizontalLineDark
+                : ColorUtils.appbarHorizontalLineLight,
+          )),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            "Transaction History",
+            style: TextStyle(
+              fontSize: 18,
+              color: isDarkMode
+                  ? ColorUtils.indicaterGreyLight
+                  : ColorUtils.appbarHorizontalLineDark,
+              fontFamily: "Switzer",
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          Icon(
+            Icons.arrow_forward,
+            size: 20,
+            color: isDarkMode
+                ? ColorUtils.indicaterGreyLight
+                : ColorUtils.blackColor,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget buildAssets(bool isDarkMode) {
+    return SingleChildScrollView(
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 15),
+        decoration: BoxDecoration(
+            color: isDarkMode
+                ? ColorUtils.appbarBackgroundDark
+                : ColorUtils.bottomBarLight,
+            border: Border.all(
+              color: isDarkMode
+                  ? ColorUtils.appbarHorizontalLineDark
+                  : ColorUtils.appbarHorizontalLineLight,
+            )),
+        child: Column(
+          children: walletController.assets.map(
+            (e) {
+              return buildAssetsMainData(
+                  image: e["id"] ?? "isEmpty",
+                  isDarkMode: isDarkMode,
+                  title1: e['id'] ?? "isEmpty",
+                  price1: e['balance'] ?? "isEmpty",
+                  title2:
+                      "${e['balance']} ${walletController.buildSortNames(e['id'])} " ??
+                          "isEmpty",
+                  price2: e['conversion'] ?? "isEmpty");
+            },
+          ).toList(),
+        ),
+      ),
+    );
+  }
+
+  Widget buildAssetsMainData(
+      {required String image,
+      required bool isDarkMode,
+      required String title1,
+      required String title2,
+      required String price1,
+      required String price2}) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            children: [
+              Image.asset(
+                walletController.buildSortImages(image),
+                height: 45,
+                width: 45,
+                fit: BoxFit.fill,
+              ),
+              const SizedBox(
+                width: 8,
+              ),
+              buildAssetsData(
+                  isDarkMode,
+                  walletController.buildSortNames(title1),
+                  price1,
+                  CrossAxisAlignment.start),
+            ],
+          ),
+          buildAssetsData(isDarkMode, title2, price2, CrossAxisAlignment.end),
+        ],
+      ),
+    );
+  }
+
+  Widget buildAssetsData(bool isDarkMode, String title1, String title2,
+      CrossAxisAlignment aliment) {
+    return Column(
+      crossAxisAlignment: aliment,
+      children: [
+        Text(
+          title1,
+          style: TextStyle(
+            fontWeight: FontWeight.w500,
+            fontFamily: "Switzer",
+            fontSize: 16,
+            color:
+                isDarkMode ? Colors.white : ColorUtils.appbarHorizontalLineDark,
+          ),
+        ),
+        Text(
+          title2,
+          style: TextStyle(
+            color: isDarkMode
+                ? ColorUtils.darkModeGrey2
+                : ColorUtils.dropDownBackGroundDark,
+            fontWeight: FontWeight.w500,
+            fontFamily: "Switzer",
+            fontSize: 14,
+          ),
+        )
+      ],
+    );
+  }
+
+  Widget buildShowTotalBalance(BuildContext context, bool isDarkMode) {
+    return Container(
+      height: 220,
+      width: double.maxFinite,
+      margin: const EdgeInsets.symmetric(horizontal: 15),
+      decoration: const BoxDecoration(
+        image: DecorationImage(
+          image: AssetImage("assets/images/wallet-card.png"),
+          fit: BoxFit.fill,
+        ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.only(top: 15, left: 10, right: 10),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            buildTotalBalanceText(context, isDarkMode),
+            buildPriceText(isDarkMode),
+            buildCopyText(),
+            const SizedBox(
+              height: 10,
+            ),
+            buildButton(
+                onTap: () {},
+                "Invest Now",
+                ColorUtils.loginButton,
+                Colors.white),
+            const SizedBox(
+              height: 10,
+            ),
+            buildSellAndTranserButton()
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget buildSellAndTranserButton() {
+    return Row(
+      children: [
+        Expanded(
+            child: buildButton(onTap: () {
+          Get.to(TransferFundsScreen());
+        }, "Transfer", Colors.white,
+                const Color.fromRGBO(255, 255, 255, 0.24))),
+        const SizedBox(
+          width: 10,
+        ),
+        Expanded(
+            child: buildButton(
+                onTap: () {},
+                "Claim",
+                Colors.white,
+                const Color.fromRGBO(255, 255, 255, 0.24))),
+      ],
+    );
+  }
+
+  Widget buildButton(String title, Color textcolor1, Color boxcolor2,
+      {required void Function() onTap}) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        height: 40,
+        color: boxcolor2,
+        child: Center(
+          child: Text(
+            title,
+            style: TextStyle(
+              color: textcolor1,
+              fontFamily: "Switzer",
+              fontSize: 14,
+              fontWeight: FontWeight.w400,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget buildCopyText() {
+    return Row(
+      children: [
+        Text(
+          walletController.copyString.value,
+          style: const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w400,
+            fontFamily: "Switzer",
+          ),
+        ),
+        const SizedBox(
+          width: 5,
+        ),
+        GestureDetector(
+          onTap: () {
+            Clipboard.setData(
+                ClipboardData(text: walletController.copyString.value));
+          },
+          child: Image.asset(
+            "assets/images/copy-img.png",
+            height: 18,
+            width: 18,
+            fit: BoxFit.fill,
+          ),
+        )
+      ],
+    );
+  }
+
+  Widget buildPriceText(bool isDarkMode) {
+    return const Text(
+      "\$${0.0}",
+      style: TextStyle(
+        fontSize: 32,
+        fontWeight: FontWeight.w600,
+        fontFamily: "Switzer",
+      ),
+    );
+  }
+
+  Widget buildTotalBalanceText(BuildContext context, bool isDarkMode) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        const Text(
+          "Total Balance",
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+            fontFamily: "Switzer",
+          ),
+        ),
+        Row(
+          children: [
+            GestureDetector(
+              onTap: () {},
+              child: Icon(
+                walletController.isBalanceShow.value
+                    ? Icons.visibility
+                    : Icons.visibility_off,
+                color: Colors.white,
+                size: 20,
+              ),
+            ),
+            const SizedBox(
+              width: 5,
+            ),
+            GestureDetector(
+              onTap: () {
+                showNetworkSelectionBottomSheet(context, isDarkMode);
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                    border: Border.all(
+                      color: Colors.white,
+                      width: 1,
+                    ),
+                    borderRadius: BorderRadius.circular(12)),
+                padding: const EdgeInsets.symmetric(horizontal: 5),
+                child: Row(
+                  children: [
+                    Text(
+                      walletController.selectedNetwork.value,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                        fontFamily: "Switzer",
+                      ),
+                    ),
+                    const Icon(
+                      Icons.keyboard_arrow_down,
+                      size: 20,
+                      color: Colors.white,
+                    )
+                  ],
+                ),
+              ),
+            )
+          ],
+        )
+      ],
+    );
+  }
+
+  void showNetworkSelectionBottomSheet(BuildContext context, bool isDarkMode) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      backgroundColor: Colors.black,
+      builder: (_) {
+        return Container(
+          height: MediaQuery.of(context).size.height * 0.4,
+          decoration: BoxDecoration(
+            color: ColorUtils.appbarBackgroundDark,
+            border: const Border(
+                top: BorderSide(
+              color: ColorUtils.appbarHorizontalLineDark,
+            )),
+            borderRadius: BorderRadius.circular(15),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                margin:
+                    const EdgeInsets.symmetric(horizontal: 23, vertical: 15),
+                child: const Text(
+                  'Select Network',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              Expanded(
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  scrollDirection: Axis.vertical,
+                  itemCount: walletController.networks.length,
+                  itemBuilder: (context, index) {
+                    final network = walletController.networks[index];
+                    return Column(
+                      children: [
+                        if (index == 0)
+                          const Divider(
+                            color: ColorUtils.appbarHorizontalLineDark,
+                            thickness: 1,
+                            height: 1,
+                          ),
+                        ListTile(
+                          leading: CircleAvatar(
+                            backgroundImage: AssetImage(network['icon']!),
+                          ),
+                          title: Text(
+                            network['name']!,
+                            style: const TextStyle(color: Colors.white),
+                          ),
+                          trailing: Container(
+                            height: 20,
+                            width: 20,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: walletController.selectedNetwork.value ==
+                                        network['name']
+                                    ? Colors.orange
+                                    : Colors.grey,
+                                width: walletController.selectedNetwork.value ==
+                                        network['name']
+                                    ? 6
+                                    : 1,
+                              ),
+                              color: walletController.selectedNetwork.value ==
+                                      network['name']
+                                  ? Colors.black
+                                  : Colors.transparent,
+                            ),
+                            child: walletController.selectedNetwork.value ==
+                                    network['name']
+                                ? Center(
+                                    child: Container(
+                                      height: 10,
+                                      width: 10,
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: isDarkMode
+                                            ? ColorUtils.whiteColor
+                                            : ColorUtils.blackColor,
+                                      ),
+                                    ),
+                                  )
+                                : null,
+                          ),
+                          onTap: () {
+                            walletController.selectedNetwork.value =
+                                network['name']!;
+                            Get.back();
+                          },
+                        ),
+                        if (index != walletController.networks.length - 1)
+                          const Divider(
+                            color: ColorUtils.appbarHorizontalLineDark,
+                            thickness: 1,
+                            height: 1,
+                          ),
+                      ],
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}

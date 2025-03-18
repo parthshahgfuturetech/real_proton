@@ -1,0 +1,2 @@
+/Users/parthgunvantbhaishah/Documents/Parth Shah/GFuture Tech/real_proton/android/app/.cxx/Debug/48a2f4g3/x86/CMakeFiles/edit_cache.dir
+/Users/parthgunvantbhaishah/Documents/Parth Shah/GFuture Tech/real_proton/android/app/.cxx/Debug/48a2f4g3/x86/CMakeFiles/rebuild_cache.dir

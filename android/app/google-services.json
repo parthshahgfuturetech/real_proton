@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "967420379280",
+    "firebase_url": "https://realproton-340e3-default-rtdb.firebaseio.com",
+    "project_id": "realproton-340e3",
+    "storage_bucket": "realproton-340e3.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:967420379280:android:537e2b196d75f022f3d815",
+        "android_client_info": {
+          "package_name": "com.example.real_proton"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "967420379280-agn25qdaadfll91edm8s1r4nfe8pevj5.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.real_proton",
+            "certificate_hash": "d82b0e7b147dabfb773bf627be6f7b6115e385ea"
+          }
+        },
+        {
+          "client_id": "967420379280-9kl19reje9mavhq5q02l6miufsefu2bl.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCh-wbR4XvBfZTeZqAoO9S6cHuFlwbc484"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "967420379280-9kl19reje9mavhq5q02l6miufsefu2bl.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "967420379280-88kte29hejno396fitahctkkldpfpmg1.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.realProton"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
