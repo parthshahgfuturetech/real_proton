@@ -18,6 +18,7 @@ class StringUtils{
   static const investNow = 'Invest Now';
   static const transferFund = "Transfer Funds";
   static const accountVerification = "Account Verification";
+  static const resetYourPin = "Reset Your PIN";
   static const changePassword = 'Change Password';
   static const forgotPasswordButton2 = 'Back to sign in';
   static const checkMailSubTitle1 = 'We sent an email to ';

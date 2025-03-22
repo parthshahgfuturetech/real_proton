@@ -11,10 +11,13 @@ import 'package:real_proton/modules/history/history_screen.dart';
 import 'package:real_proton/modules/login_screen/login_controller.dart';
 import 'package:real_proton/modules/notification_screen/notification_setting_screen.dart';
 import 'package:real_proton/modules/rate_us_screen/rate_us_screen.dart';
+import 'package:real_proton/modules/securitySettings_screen/security_settings_screen.dart';
 import 'package:real_proton/utils/colors.dart';
 import 'package:real_proton/utils/images.dart';
 import 'package:real_proton/utils/theme.dart';
 import 'package:real_proton/utils/widgets.dart';
+
+import '../../create_your_pin_screen/create_your_pin_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   ProfileScreen({super.key});
@@ -161,6 +164,9 @@ class ProfileScreen extends StatelessWidget {
       Get.to(() => AccountVerificationScreen());
     } else if (title == "Notification Setting") {
       Get.to(() => NotificationSettingsScreen());
+    }else if (title == "Security Settings") {
+      // Get.to(() => SecuritySettingsScreen());
+      Get.to(() => CreateYourPinScreen());
     } else if (title == 'Appearance') {
       Get.to(() => AppearanceScreen());
     } else if (title == 'Rate Us') {

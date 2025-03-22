@@ -10,45 +10,55 @@ class NotificationScreen extends StatelessWidget {
 
   final NotificationController controller = Get.put(NotificationController());
   final ThemeController themeController = Get.find();
+  final TextStyle titleStyle = TextStyle(fontSize: 16, fontWeight: FontWeight.bold);
+  final TextStyle bodyStyle = TextStyle(color: Colors.grey[400]);
+
+
 
   @override
   Widget build(BuildContext context) {
     final isDarkMode = themeController.themeMode.value == ThemeMode.dark ||
         (themeController.themeMode.value == ThemeMode.system &&
             MediaQuery.of(context).platformBrightness == Brightness.dark);
+
     return Scaffold(
       appBar: buildAppBar(isDarkMode),
-      backgroundColor:
-      isDarkMode ? Colors.black : ColorUtils.scaffoldBackGroundLight,
-      body: Obx(
-            () => SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(height: 15,),
+      backgroundColor: isDarkMode
+          ? Colors.black
+          : ColorUtils.scaffoldBackGroundLight,
+      body: Obx(() {
+        final todayNotifications = controller.notifications
+            .where((n) => n['isToday'] == true)
+            .toList();
+        final earlierNotifications = controller.notifications
+            .where((n) => n['isToday'] == false)
+            .toList();
+
+        return ListView(
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          children: [
+            if (todayNotifications.isNotEmpty)
               buildSectionHeader(
                 title: 'Today',
                 actionText: 'Mark all as Read',
                 onActionTap: controller.markAllAsRead,
-                isDarkMode: isDarkMode
+                isDarkMode: isDarkMode,
               ),
-              SizedBox(height: 15,),
-              ...controller.notifications
-                  .where((notification) => notification['isToday'] == true)
-                  .map((notification) => buildNotificationTile(notification,isDarkMode))
-                  .toList(),
-              const SizedBox(height: 16),
-              // Earlier Section
-              buildSectionHeader(title: 'Earlier',isDarkMode: isDarkMode),
-              SizedBox(height: 15,),
-              ...controller.notifications
-                  .where((notification) => notification['isToday'] == false)
-                  .map((notification) => buildNotificationTile(notification,isDarkMode))
-                  .toList(),
-            ],
-          ),
-        ),
-      ),
+            ...todayNotifications.map(
+                  (n) => buildNotificationTile(n, isDarkMode),
+            ),
+
+            if (earlierNotifications.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.only(left: 16, top: 20, bottom: 8),
+                child: _sectionTitle('Earlier'),
+              ),
+            ...earlierNotifications.map(
+                  (n) => buildNotificationTile(n, isDarkMode),
+            ),
+          ],
+        );
+      }),
     );
   }
 
@@ -66,12 +76,15 @@ class NotificationScreen extends StatelessWidget {
       ),
       backgroundColor:
       isDarkMode ? ColorUtils.appbarBackgroundDark : Colors.white,
-      title:buildAppBarTitle("Notification",isDarkMode),
+      title: buildAppBarTitle("Notification", isDarkMode),
       centerTitle: true,
       leading: IconButton(
-        icon: Icon(Icons.arrow_back_ios, color: isDarkMode ? Colors.white :ColorUtils.appbarBackgroundDark ,size: 15,),
+        icon: Icon(Icons.arrow_back_ios,
+            color:
+            isDarkMode ? Colors.white : ColorUtils.appbarBackgroundDark,
+            size: 15),
         onPressed: () {
-          Get.back(); // Navigate back
+          Get.back();
         },
       ),
     );
@@ -104,10 +117,10 @@ class NotificationScreen extends StatelessWidget {
         children: [
           Text(
             title,
-            style:  TextStyle(
+            style: TextStyle(
               color: isDarkMode
-              ? ColorUtils.indicaterGreyLight
-              : ColorUtils.appbarHorizontalLineDark,
+                  ? ColorUtils.indicaterGreyLight
+                  : ColorUtils.appbarHorizontalLineDark,
               fontSize: 16,
               fontWeight: FontWeight.bold,
             ),
@@ -119,7 +132,9 @@ class NotificationScreen extends StatelessWidget {
                 height: 30,
                 padding: EdgeInsets.symmetric(horizontal: 10),
                 decoration: BoxDecoration(
-                  color: isDarkMode ? Colors.white.withOpacity(0.16) : ColorUtils.indicaterGreyLight,
+                  color: isDarkMode
+                      ? Colors.white.withOpacity(0.16)
+                      : ColorUtils.indicaterGreyLight,
                   border: Border.all(
                     color: isDarkMode
                         ? ColorUtils.appbarHorizontalLineDark
@@ -130,7 +145,9 @@ class NotificationScreen extends StatelessWidget {
                   child: Text(
                     actionText,
                     style: TextStyle(
-                      color: isDarkMode ? Colors.white : ColorUtils.appbarBackgroundDark,
+                      color: isDarkMode
+                          ? Colors.white
+                          : ColorUtils.appbarBackgroundDark,
                       fontSize: 12,
                       fontFamily: "Switzer",
                       fontWeight: FontWeight.w500,
@@ -144,30 +161,36 @@ class NotificationScreen extends StatelessWidget {
     );
   }
 
-  Widget buildNotificationTile(Map<String, dynamic> notification,bool isDarkMode) {
+  Widget buildNotificationTile(Map<String, dynamic> notification, bool isDarkMode) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 15),
+      margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 6),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: isDarkMode ? notification['isRead']
+        color: isDarkMode
+            ? (notification['isRead']
             ? ColorUtils.appbarBackgroundDark
-            : ColorUtils.notificationColor  : notification['isRead']
+            : ColorUtils.notificationColor)
+            : (notification['isRead']
             ? ColorUtils.bottomBarLight
-            : ColorUtils.notificationLight,
-        border: isDarkMode ? Border.all(
+            : ColorUtils.notificationLight),
+        border: Border.all(
           color: notification['isRead']
+              ? (isDarkMode
               ? ColorUtils.appbarHorizontalLineDark
-              : ColorUtils.notificationBorderColor,
-        ) : Border.all(
-          color: notification['isRead']
-              ? ColorUtils.appbarHorizontalLineLight
+              : ColorUtils.appbarHorizontalLineLight)
               : ColorUtils.notificationBorderColor,
         ),
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Image.asset(isDarkMode ? ImageUtils.checkmark5 :ImageUtils.checkmark6,height: 40,width: 40,fit: BoxFit.fill,),
+          Image.asset(
+            isDarkMode ? ImageUtils.checkmark5 : ImageUtils.checkmark6,
+            height: 40,
+            width: 40,
+            fit: BoxFit.fill,
+          ),
           const SizedBox(width: 10),
           Expanded(
             child: Column(
@@ -179,7 +202,7 @@ class NotificationScreen extends StatelessWidget {
                     Text(
                       notification['title'],
                       style: TextStyle(
-                        color:isDarkMode
+                        color: isDarkMode
                             ? ColorUtils.indicaterGreyLight
                             : ColorUtils.appbarHorizontalLineDark,
                         fontSize: 16,
@@ -215,6 +238,13 @@ class NotificationScreen extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _sectionTitle(String text) {
+    return Text(
+      text,
+      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
     );
   }
 }

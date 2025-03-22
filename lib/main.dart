@@ -22,6 +22,14 @@ import 'package:real_proton/utils/strings.dart';
 import 'package:real_proton/utils/theme.dart';
 import 'package:real_proton/utils/widgets.dart';
 
+import 'SplashScreen.dart';
+import 'modules/confirm_your-pin/confirm_your_pin.dart';
+import 'modules/create_your_pin_screen/create_your_pin_screen.dart';
+import 'modules/create_your_pin_screen/password_reset_successfully_screen.dart';
+import 'modules/reset_your_pin/reset_your_otp.dart';
+import 'modules/reset_your_pin/reset_your_pin.dart';
+import 'modules/securitySettings_screen/security_settings_screen.dart';
+
 final BottomBarController bottomBarController = Get.put(BottomBarController());
 final ProfileController profileController = Get.put(ProfileController());
 final SaleController saleController = Get.put(SaleController());
@@ -46,7 +54,11 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  Get.put(ThemeController());
+  final themeController = Get.put(ThemeController());
+
+  // Get.put(ThemeController());
+  await themeController.loadThemeMode(); // Load theme before app starts
+
   runApp(MyApp());
 }
 
@@ -62,7 +74,8 @@ class MyApp extends StatelessWidget {
           theme: ThemeData.light(),
           darkTheme: ThemeData.dark(),
           themeMode: themeController.themeMode.value,
-          home: decideStartScreen(),
+          home: SplashScreen(),  // Ensures the correct start screen
+
         );
       },
     );
@@ -78,7 +91,9 @@ class MyApp extends StatelessWidget {
         (googleToken != null && googleToken.isNotEmpty)) {
       return BottomBar();
     } else {
-      return LeandingScreen();
+      return SplashScreen();
     }
   }
 }
+
+

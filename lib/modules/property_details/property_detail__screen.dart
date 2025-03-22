@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:real_proton/main.dart';
@@ -14,41 +16,46 @@ class PropertyDetailsScreen extends StatelessWidget {
 
   final ThemeController themeController = Get.find();
   final PropertyDetailsController controller =
-      Get.put(PropertyDetailsController());
+  Get.put(PropertyDetailsController());
+  final List<String> imageName = [ImageUtils.image1, ImageUtils.image2];
 
   @override
   Widget build(BuildContext context) {
     final isDarkMode = themeController.themeMode.value == ThemeMode.dark ||
         (themeController.themeMode.value == ThemeMode.system &&
-            MediaQuery.of(context).platformBrightness == Brightness.dark);
+            MediaQuery
+                .of(context)
+                .platformBrightness == Brightness.dark);
     return Obx(
-      () => Scaffold(
-        backgroundColor:
+          () =>
+          Scaffold(
+            backgroundColor:
             isDarkMode ? Colors.black : ColorUtils.scaffoldBackGroundLight,
-        body: Column(
-          children: [
-            Expanded(
-              child: SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 15),
-                  child: Column(
-                    children: [
-                      buildImagesPageView(),
-                      buildOwnerNameAndAddress(isDarkMode),
-                    ],
+            body: Column(
+              children: [
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 15),
+                      child: Column(
+                        children: [
+                          buildImagesPageView(),
+                          buildOwnerNameAndAddress(isDarkMode),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
-              ),
+                Divider(),
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 15, vertical: 10),
+                  child: CustomWidgets.buildGetStartedButton(
+                      onPressed: () {}, text: 'Invest Now'),
+                )
+              ],
             ),
-            Divider(),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-              child: CustomWidgets.buildGetStartedButton(
-                  onPressed: () {}, text: 'Invest Now'),
-            )
-          ],
-        ),
-      ),
+          ),
     );
   }
 
@@ -134,11 +141,16 @@ class PropertyDetailsScreen extends StatelessWidget {
             itemCount: imageName.length,
             itemBuilder: (context, index) {
               final data = imageName[index];
-              return Image.asset(
-                data,
-                height: 30,
-                width: double.infinity,
-                fit: BoxFit.fill,
+              return GestureDetector(
+                onTap: () {
+                  controller.openImagePopup(context, index,imageName);
+                },
+                child: Image.asset(
+                  data,
+                  height: 30,
+                  width: double.infinity,
+                  fit: BoxFit.fill,
+                ),
               );
             },
           ),
@@ -201,8 +213,8 @@ class PropertyDetailsScreen extends StatelessWidget {
             color: controller.selectedTab.value == index
                 ? (isDarkMode ? Colors.white : ColorUtils.loginButton)
                 : (isDarkMode
-                    ? ColorUtils.appbarHorizontalLineDark
-                    : ColorUtils.indicaterGreyLight),
+                ? ColorUtils.appbarHorizontalLineDark
+                : ColorUtils.indicaterGreyLight),
           ),
           child: Center(
             child: Text(
@@ -213,11 +225,11 @@ class PropertyDetailsScreen extends StatelessWidget {
                 fontFamily: "Switzer",
                 color: controller.selectedTab.value == index
                     ? (isDarkMode
-                        ? ColorUtils.loginButton
-                        : ColorUtils.whiteColor)
+                    ? ColorUtils.loginButton
+                    : ColorUtils.whiteColor)
                     : (isDarkMode
-                        ? ColorUtils.indicaterGreyLight
-                        : ColorUtils.appbarHorizontalLineDark),
+                    ? ColorUtils.indicaterGreyLight
+                    : ColorUtils.appbarHorizontalLineDark),
               ),
             ),
           ),
@@ -353,4 +365,7 @@ class PropertyDetailsScreen extends StatelessWidget {
       ],
     );
   }
+
+
+
 }

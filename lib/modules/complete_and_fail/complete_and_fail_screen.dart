@@ -4,6 +4,8 @@ import 'package:real_proton/main.dart';
 import 'package:real_proton/utils/colors.dart';
 import 'package:real_proton/utils/images.dart';
 
+import '../../utils/widgets.dart';
+
 class CompleteAndFailScreen extends StatelessWidget {
   CompleteAndFailScreen({super.key});
 
@@ -11,22 +13,20 @@ class CompleteAndFailScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Obx(
       ()=> Scaffold(
-        backgroundColor: completeAndFailController.isCompleteAndFail.value
-            ? ColorUtils.indicaterColor1
-            : ColorUtils.failColor,
         body: SafeArea(
           bottom: true,
           minimum: EdgeInsets.only(bottom: 20),
           child:  completeAndFailController.isCompleteAndFail.value
                 ? buildComplete()
-                : buildFailContainer(),
+                : buildComplete(),
         ),
       ),
     );
   }
 
   Widget buildFailContainer() {
-    return SizedBox(
+    return Container(
+      color: ColorUtils.failColor,
       width: double.infinity,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -49,56 +49,197 @@ class CompleteAndFailScreen extends StatelessWidget {
     return Column(
       children: [
         Expanded(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Image.asset(
-                ImageUtils.checkmark1,
-                height: 100,
-                width: 100,
-                fit: BoxFit.fill,
-              ),
-              buildTitleText("Congratulations!"),
-              buildSubTitleText(
-                  "Your Purchase Has Been Completed\nSuccessfully!"),
-            ],
-          ),
-        ),
-        Container(
-          height: 30,
-          width: double.infinity,
-          alignment: Alignment.center,
-          color: ColorUtils.completeGreenColor,
-          child: Text(
-            "Your Tokens Are Locked For 90 Days!",
-            style: TextStyle(
-              fontSize: 13,
-              fontFamily: "Switzer",
-              fontWeight: FontWeight.w500,
+          child: Container(
+            color: ColorUtils.indicaterColor1,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Image.asset(
+                  ImageUtils.checkmark1,
+                  height: 100,
+                  width: 100,
+                  fit: BoxFit.fill,
+                ),
+                buildTitleText("Payment Received!"),
+                buildSubTitleText(
+                    "Your transaction has been successfully completed.\nYour RP Tokens will be credited to your account after verification"),
+              ],
             ),
           ),
         ),
-        Container(
-          height: 50,
-          width: double.infinity,
-          margin: EdgeInsets.symmetric(horizontal: 20, vertical: 13),
-          decoration: BoxDecoration(color: Colors.white),
-          child: GestureDetector(
-            onTap: () {
-              completeAndFailController.isCompleteAndFail.value = false;
+        // Container(
+        //   height: 30,
+        //   width: double.infinity,
+        //   alignment: Alignment.center,
+        //   color: ColorUtils.completeGreenColor,
+        //   child: Text(
+        //     "Your Tokens Are Locked For 90 Days!",
+        //     style: TextStyle(
+        //       fontSize: 13,
+        //       fontFamily: "Switzer",
+        //       fontWeight: FontWeight.w500,
+        //     ),
+        //   ),
+        // ),
+        // Container(
+        //   height: 50,
+        //   width: double.infinity,
+        //   margin: EdgeInsets.symmetric(horizontal: 20, vertical: 13),
+        //   decoration: BoxDecoration(color: Colors.white),
+        //   child: GestureDetector(
+        //     onTap: () {
+        //       completeAndFailController.isCompleteAndFail.value = false;
+        //     },
+        //     child: Center(
+        //       child: Text(
+        //         "View All Transactions",
+        //         style: TextStyle(
+        //           color: ColorUtils.indicaterColor1,
+        //         ),
+        //       ),
+        //     ),
+        //   ),
+        // ),
+
+        SizedBox(height: 20),
+
+    Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 15),
+      child: Column(
+        children: [
+          buildTimelineItem(
+            "Payment Received",
+            "USDT has been Deducted from your wallet\nand Sent to Admin",
+            true,false
+          ),
+          buildTimelineItem(
+            "Submitted For Approval",
+            "Waiting For Approval of Your Transaction",
+            true,false
+          ),
+          buildTimelineItem(
+            "Token Received",
+            "Your RP Tokens Credited in Your Wallet",
+            true,true
+          ),
+          SizedBox(height: 20),
+
+          // Transaction Details
+          Container(
+            padding: EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: ColorUtils.appbarBackgroundDark,
+
+              border: Border.all(color: ColorUtils.loginButton, width: 1.5),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                buildTransactionDetail("Amount", "\$180.00"),
+                buildTransactionDetail("Expected RP Token", "15.00 RP"),
+                buildTransactionDetail("Transaction Id", "0x..hbdvdvndvndvbdjvnd"),
+                buildTransactionDetail("Date & Time", "January 11, 2025, 3:45 PM UTC"),
+              ],
+            ),
+          ),
+          SizedBox(height: 20),
+
+          CustomWidgets.buildGetStartedButton(
+            onPressed: () {
+              Get.back();
             },
-            child: Center(
-              child: Text(
-                "View All Transactions",
-                style: TextStyle(
-                  color: ColorUtils.indicaterColor1,
+            text: 'Done',
+           ),
+
+        ],
+      ),
+    ),
+        ],
+
+    );
+  }
+  Widget buildTimelineItem(String title, String subtitle, bool isCompleted, bool isLast) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Column(
+          children: [
+            // Circle with inner white dot
+            Container(
+              width: 18,
+              height: 18,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.green, // Outer green circle
+              ),
+              child: Center(
+                child: Container(
+                  width: 10,
+                  height: 18,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.white, // Inner white dot
+                  ),
                 ),
               ),
             ),
+
+            if (!isLast)
+              Align(
+                alignment: Alignment.center, // Ensures proper alignment
+                child: Container(
+                  width: 4,
+                  height: 55, // Adjust height to match spacing
+                  color: Colors.green,
+                ),
+              ),
+          ],
+        ),
+        SizedBox(width: 12), // Adjust spacing
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: TextStyle(
+                  fontSize: 18,
+                  fontFamily: "Switzer",
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+              SizedBox(height: 0),
+              Text(
+                subtitle,
+                style: TextStyle(
+                  fontSize: 14,
+                  fontFamily: "Switzer",
+                  color: ColorUtils.forgotPasswordTextDark, // Adjusted color for description
+                ),
+              ),
+              SizedBox(height: 10),
+            ],
           ),
-        )
+        ),
       ],
     );
+  }
+
+
+  Widget buildTransactionDetail(String title, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 5),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(title, style: TextStyle(color: ColorUtils.forgotPasswordTextDark,fontWeight: FontWeight.w400, fontSize: 14,fontFamily: "Switzer")),
+          Text(value, style: TextStyle(fontSize: 14,fontFamily: "Switzer", fontWeight: FontWeight.w600, color: Colors.white)),
+        ],
+      ),
+    );
+
   }
 
   Widget buildSubTitleText(String text) {

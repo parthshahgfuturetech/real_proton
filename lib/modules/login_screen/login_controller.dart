@@ -142,6 +142,10 @@ class LoginController extends GetxController {
     final loginData = {
       "email": email,
       "password": password,
+      "ipAddress":'49.37.24.116',
+      "lat":'33',
+      "long":'49.37',
+      "os":'windows',
     };
     try {
       final response = await apiServiceClass.post(context, ApiUtils.loginAPi,

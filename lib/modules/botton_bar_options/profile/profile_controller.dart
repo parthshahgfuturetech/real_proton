@@ -60,6 +60,7 @@ class ProfileController extends GetxController {
 
   final List<String> profileAppSettingsDarkImageDark = [
     ImageUtils.profileImg6,
+    ImageUtils.profileImg12,
     ImageUtils.profileImg7,
     ImageUtils.profileImg8,
     ImageUtils.profileImg9,
@@ -67,6 +68,7 @@ class ProfileController extends GetxController {
 
   final List<String> profileAppSettingsLightImageLight = [
     ImageUtils.profileImageLight6,
+    ImageUtils.profileImageLight12,
     ImageUtils.profileImageLight7,
     ImageUtils.profileImageLight8,
     ImageUtils.profileImageLight9,
@@ -95,6 +97,10 @@ class ProfileController extends GetxController {
     {
       'title': 'Notification Setting',
       'subtitle': 'Manage Your Notifications',
+    },
+    {
+      'title': 'Security Settings',
+      'subtitle': 'Manage Your Security PIN',
     },
     {
       'title': 'Appearance',

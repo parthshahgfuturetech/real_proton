@@ -24,6 +24,7 @@ class ImageUtils{
   static const profileImg4 = "assets/images/profile-img-4.png";
   static const profileImg5 = "assets/images/profile-img-5.png";
   static const profileImg6 = "assets/images/profile-img-6.png";
+  static const profileImg12 = "assets/images/profile-img-12.png";
   static const profileImg7 = "assets/images/profile-img-7.png";
   static const profileImg8 = "assets/images/profile-img-8.png";
   static const profileImg9 = "assets/images/profile-img-9.png";
@@ -69,6 +70,7 @@ class ImageUtils{
   static const profileImageLight9 = "assets/images/profile-img-light-9.png";
   static const profileImageLight10 = "assets/images/profile-img-light-10.png";
   static const profileImageLight11 = "assets/images/profile-img-light-11.png";
+  static const profileImageLight12 = "assets/images/profile-img-light-12.png";
   static const arrowSellDownLight = "assets/images/arrowSellDownLight.png";
   static const arrowSellUpLight = "assets/images/arrowSellUpLight.png";
   static const location = "assets/images/location.png";

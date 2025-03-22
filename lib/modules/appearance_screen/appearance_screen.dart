@@ -28,36 +28,30 @@ class AppearanceScreen extends StatelessWidget {
               children: [
                 buildThemeOptionTile(
                   title: "Light Theme",
-                  description:
-                      "Enjoy a clean and bright interface designed for optimal visibility in well-lit environments.",
+                  description: "Bright interface for well-lit environments.",
                   value: AppThemeMode.light,
                   groupValue: _getAppThemeMode(themeController.themeMode.value),
                   onChanged: (selectedValue) {
-                    // controller.updateTheme(selectedValue);
                     themeController.setThemeMode(ThemeMode.light);
                   },
                   isDarkMode: isDarkMode,
                 ),
                 buildThemeOptionTile(
                   title: "Dark Theme",
-                  description:
-                      "Switch to a sleek, modern design that reduces eye strain in low-light settings.",
+                  description: "Reduces eye strain in low-light settings.",
                   value: AppThemeMode.dark,
                   groupValue: _getAppThemeMode(themeController.themeMode.value),
                   onChanged: (selectedValue) {
-                    // controller.updateTheme(selectedValue);
                     themeController.setThemeMode(ThemeMode.dark);
                   },
                   isDarkMode: isDarkMode,
                 ),
                 buildThemeOptionTile(
                   title: "System Default",
-                  description:
-                      "Automatically adapt the app's appearance to match your device's system settings for a seamless experience.",
+                  description: "Adapts to your system's appearance.",
                   value: AppThemeMode.system,
                   groupValue: _getAppThemeMode(themeController.themeMode.value),
                   onChanged: (selectedValue) {
-                    // controller.updateTheme(selectedValue);
                     themeController.setThemeMode(ThemeMode.system);
                   },
                   isDarkMode: isDarkMode,
