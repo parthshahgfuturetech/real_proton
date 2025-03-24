@@ -12,6 +12,7 @@ class WalletController extends GetxController {
       isLoading = false.obs;
   var selectedNetwork = 'Ethereum'.obs;
   var copyString = "0xgbg...vbhgj".obs;
+  RxDouble rpPrice= 0.0.obs;
   var assets = [].obs;
   final Logger _logger = Logger();
   final ApiService apiService = ApiService();
@@ -61,6 +62,8 @@ class WalletController extends GetxController {
         return 'assets/images/USDC-crypto-icon.png';
       case 'USDDUMMY_B7ZRVRFH_K71G':
         return 'assets/images/logo-withoutborder.png';
+      case 'AVAXTEST':
+        return 'assets/images/stroke-rounded-6.png';
       default:
         return 'assets/images/logo-withoutborder.png';
     }
@@ -90,6 +93,65 @@ class WalletController extends GetxController {
         return 'USDD';
       case 'AVAXTEST':
         return 'AVAXTEST';
+      default:
+        return 'UnKnowName';
+    }
+  }
+
+  String buildSortPrice2(double balance,String id) {
+    switch (id) {
+      case 'RP_B6TVQTHS_W0V6':
+        return (rpPrice.value * balance).toString();
+      case 'ETH-OPT_SEPOLIA':
+        return 'ETH';
+      case 'BNB_TEST':
+        return 'BSC';
+      case 'AMOY_POLYGON_TEST':
+        return 'POLYGON';
+      case 'CELO_ALF':
+        return 'CELO';
+      case 'ARBITRUM':
+        return 'ARBITRUM';
+      case 'USDT_B7ZRVRFH_4YOH':
+        return 'USDT';
+      case 'USDC_B7ZRVRFH_4YOH':
+        return (1*balance).toString();
+      case 'USDCDUMMY_B7ZRVRFH_F99R':
+        return (1*balance).toString();;
+      case 'USDDUMMY_B7ZRVRFH_K71G':
+        return (1*balance).toString();;
+      case 'AVAXTEST':
+        return (0*balance).toString();;
+      default:
+        return 'UnKnowName';
+    }
+  }
+
+
+  String buildSortPrice1(String id) {
+    switch (id) {
+      case 'RP_B6TVQTHS_W0V6':
+        return (rpPrice.value).toString();
+      case 'ETH-OPT_SEPOLIA':
+        return 'ETH';
+      case 'BNB_TEST':
+        return 'BSC';
+      case 'AMOY_POLYGON_TEST':
+        return 'POLYGON';
+      case 'CELO_ALF':
+        return 'CELO';
+      case 'ARBITRUM':
+        return 'ARBITRUM';
+      case 'USDT_B7ZRVRFH_4YOH':
+        return 'USDT';
+      case 'USDC_B7ZRVRFH_4YOH':
+        return (1).toString();
+      case 'USDCDUMMY_B7ZRVRFH_F99R':
+        return (1).toString();;
+      case 'USDDUMMY_B7ZRVRFH_K71G':
+        return (1).toString();;
+      case 'AVAXTEST':
+        return (0).toString();;
       default:
         return 'UnKnowName';
     }

@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:real_proton/main.dart';
 import 'package:real_proton/utils/colors.dart';
 import 'package:real_proton/utils/theme.dart';
+import 'package:real_proton/utils/widgets.dart';
 
 import 'transfer_fund__screen/transfer_fund_screen.dart';
 
@@ -19,7 +20,9 @@ class WalletScreen extends StatelessWidget {
             MediaQuery.of(context).platformBrightness == Brightness.dark);
     return Scaffold(
       body: Obx(
-        () => Container(
+        () {
+          walletController.rpPrice.value = CustomWidgets.weiToRP(blockChainController.tokenPrice.value);
+          return Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topCenter,
@@ -51,7 +54,8 @@ class WalletScreen extends StatelessWidget {
                 buildTransactionHistory(isDarkMode)
             ],
           ),
-        ),
+        );
+        },
       ),
     );
   }
@@ -132,11 +136,11 @@ class WalletScreen extends StatelessWidget {
                     image: e["id"] ?? "isEmpty",
                     isDarkMode: isDarkMode,
                     title1: e['id'] ?? "isEmpty",
-                    price1: e['balance'] ?? "isEmpty",
+                    price1: e['id'] ?? "isEmpty",
                     title2:
                         "${e['balance']} ${walletController.buildSortNames(e['id'])} " ??
                             "isEmpty",
-                    price2: e['conversion'] ?? "isEmpty");
+                    price2: e['balance'] ?? "isEmpty");
               },
             ).toList(),
           ),
@@ -171,11 +175,13 @@ class WalletScreen extends StatelessWidget {
               buildAssetsData(
                   isDarkMode,
                   walletController.buildSortNames(title1),
-                  price1,
+                  walletController.buildSortPrice1(price1),
                   CrossAxisAlignment.start),
             ],
           ),
-          buildAssetsData(isDarkMode, title2, price2, CrossAxisAlignment.end),
+          buildAssetsData(isDarkMode, title2,
+              walletController.buildSortPrice2(double.parse(price2),title1),
+              CrossAxisAlignment.end),
         ],
       ),
     );
@@ -295,7 +301,7 @@ class WalletScreen extends StatelessWidget {
     return Row(
       children: [
         Text(
-          walletController.copyString.value,
+          CustomWidgets.formatAddress(profileController.walletAddress.value),
           style: const TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w400,
@@ -308,7 +314,7 @@ class WalletScreen extends StatelessWidget {
         GestureDetector(
           onTap: () {
             Clipboard.setData(
-                ClipboardData(text: walletController.copyString.value));
+                ClipboardData(text: profileController.walletAddress.value));
           },
           child: Image.asset(
             "assets/images/copy-img.png",
