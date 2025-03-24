@@ -16,22 +16,25 @@ class HelpSupportScreen extends StatelessWidget {
     final isDarkMode = themeController.themeMode.value == ThemeMode.dark ||
         (themeController.themeMode.value == ThemeMode.system &&
             MediaQuery.of(context).platformBrightness == Brightness.dark);
-    return Scaffold(
-      backgroundColor:
-          isDarkMode ? Colors.black : ColorUtils.scaffoldBackGroundLight,
-      appBar: buildAppBar(isDarkMode),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            buildExpandedList(isDarkMode),
-            SizedBox(height: 16),
-            CustomWidgets.buildGetStartedButton(
-              text: 'Connect with us',
-              onPressed: () {
-                CustomWidgets.showInfo(context: context, message: "Contact us feature coming soon!");
-              },),
-          ],
+    return SafeArea(
+      top: false,
+      child: Scaffold(
+        backgroundColor:
+            isDarkMode ? Colors.black : ColorUtils.scaffoldBackGroundLight,
+        appBar: buildAppBar(isDarkMode),
+        body: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              buildExpandedList(isDarkMode),
+              SizedBox(height: 16),
+              CustomWidgets.buildGetStartedButton(
+                text: 'Connect with us',
+                onPressed: () {
+                  CustomWidgets.showInfo(context: context, message: "Contact us feature coming soon!");
+                },),
+            ],
+          ),
         ),
       ),
     );

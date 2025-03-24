@@ -2,6 +2,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:lottie/lottie.dart';
 import 'package:real_proton/main.dart';
 import 'package:real_proton/utils/colors.dart';
 import 'dart:convert';
@@ -349,6 +350,17 @@ class CustomWidgets {
     } catch (e) {
       return "Error decrypting: $e";
     }
+  }
+
+  static Widget buildLoader(){
+    return Center(
+      child: Lottie.asset(
+        'assets/jsonFile/RP Loader3.json',
+        width: 200,
+        height: 200,
+        fit: BoxFit.contain,
+      ),
+    );
   }
 
 

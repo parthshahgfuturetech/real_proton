@@ -18,84 +18,83 @@ class KycScreen extends StatelessWidget {
     final isDarkMode = themeController.themeMode.value == ThemeMode.dark ||
         (themeController.themeMode.value == ThemeMode.system &&
             MediaQuery.of(context).platformBrightness == Brightness.dark);
-    return Scaffold(
-      appBar: buildAppBar(isDarkMode),
-        body: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-          child: Obx(()=> buildKycVerification(context,isDarkMode)),
-        ));
+    return SafeArea(
+      top: false,
+      child: Scaffold(
+        appBar: buildAppBar(isDarkMode),
+          body: Obx(()=> buildKycVerification(context,isDarkMode))),
+    );
   }
 
   Widget buildKycVerification(
       BuildContext context, bool isDarkMode) {
     return Stack(
       children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            buildTitle("3. KYC Verification", isDarkMode),
-            const SizedBox(height: 20),
-            Text(
-              "Select Field",
-              style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black,
-                  fontSize: 12,
-                  fontFamily: "Switzer",
-                  fontWeight: FontWeight.w300),
-            ),
-            const SizedBox(height: 10),
-            GestureDetector(
-              onTap: () {
-                showNetworkSelectionBottomSheet(context, isDarkMode);
-              },
-              child: Container(
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: kycController.selectedNetwork.value.isEmpty
-                        ? ColorUtils.textFieldBorderColorDark
-                        : ColorUtils.loginButton,
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              buildTitle("3. KYC Verification", isDarkMode),
+              const SizedBox(height: 20),
+              Text(
+                "Select Field",
+                style: TextStyle(
+                    color: isDarkMode ? Colors.white : Colors.black,
+                    fontSize: 12,
+                    fontFamily: "Switzer",
+                    fontWeight: FontWeight.w300),
+              ),
+              const SizedBox(height: 10),
+              GestureDetector(
+                onTap: () {
+                  showNetworkSelectionBottomSheet(context, isDarkMode);
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: kycController.selectedNetwork.value.isEmpty
+                          ? ColorUtils.textFieldBorderColorDark
+                          : ColorUtils.loginButton,
+                    ),
+                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        kycController.selectedNetwork.value.isEmpty
+                            ? "Selected"
+                            : kycController.selectedNetwork.value,
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                          fontFamily: "Switzer",
+                        ),
+                      ),
+                      const Icon(
+                        Icons.keyboard_arrow_down,
+                        size: 20,
+                        color: Colors.white,
+                      )
+                    ],
                   ),
                 ),
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      kycController.selectedNetwork.value.isEmpty
-                          ? "Selected"
-                          : kycController.selectedNetwork.value,
-                      style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                        fontFamily: "Switzer",
-                      ),
-                    ),
-                    const Icon(
-                      Icons.keyboard_arrow_down,
-                      size: 20,
-                      color: Colors.white,
-                    )
-                  ],
-                ),
               ),
-            ),
-            Spacer(),
-            CustomWidgets.buildGetStartedButton(
-                text: "Next",
-                onPressed:kycController.selectedNetwork.value.isEmpty ? null :
-                    (){
-                      kycController.startKyc(emailAddress);
-                }),
-          ],
+              Spacer(),
+              CustomWidgets.buildGetStartedButton(
+                  text: "Next",
+                  onPressed:kycController.selectedNetwork.value.isEmpty ? null :
+                      (){
+                        kycController.startKyc(emailAddress);
+                  }),
+            ],
+          ),
         ),
         if (kycController.isLoading.value)
-          Positioned.fill(
-            child: Container(
-              color: Colors.black.withOpacity(0.7),
-              child: const Center(
-                child: CircularProgressIndicator(),
-              ),
-            ),
+          Container(
+              color: Color.fromRGBO(0, 0, 0, 0.67),
+            child: CustomWidgets.buildLoader(),
           ),
       ],
     );

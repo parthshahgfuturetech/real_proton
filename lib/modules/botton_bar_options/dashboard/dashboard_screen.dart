@@ -260,7 +260,10 @@ class DashboardScreen extends StatelessWidget {
   Widget buildPageView(bool isDarkMode, DashboardController controller) {
     return Obx(() {
       if (controller.isLoading.value) {
-        return const Center(child: CircularProgressIndicator());
+        return Container(
+          color: Colors.transparent,
+          child: CustomWidgets.buildLoader(),
+        );
       }
 
       if (controller.propertyList.isEmpty) {

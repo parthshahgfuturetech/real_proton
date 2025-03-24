@@ -20,47 +20,48 @@ class ForgotPasswordScreen extends StatelessWidget {
     final isDarkMode = themeController.themeMode.value == ThemeMode.dark ||
         (themeController.themeMode.value == ThemeMode.system &&
             MediaQuery.of(context).platformBrightness == Brightness.dark);
-    return Scaffold(
-      backgroundColor: isDarkMode
-          ? ColorUtils.blackColor
-          : ColorUtils.scaffoldBackGroundLight,
-      appBar: buildAppBar(isDarkMode),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Stack(
-          children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                buildTitle(isDarkMode),
-                const SizedBox(height: 8),
-                buildSubTitle(isDarkMode),
-                const SizedBox(height: 16),
-                CustomWidgets.customTextField(
-                    hintText: "Enter your email address",
-                    controller: controller.emailController,
-                    isDarkMode: isDarkMode),
-                const Spacer(),
-                CustomWidgets.buildGetStartedButton(
-                  onPressed: controller.isLoading.value
-                      ? null
-                      : () {
-                          if (controller.validateEmail(context)) {
-                            controller.forgotPassword(context);
-                          }
-                        },
-                  text: StringUtils.forgot_password_button,
-                ),
-              ],
-            ),
-            if (controller.isLoading.value)
-              Container(
-                color: Colors.black.withOpacity(0.7),
-                child: const Center(
-                  child: CircularProgressIndicator(),
-                ),
+    return SafeArea(
+      top: false,
+      child: Scaffold(
+        backgroundColor: isDarkMode
+            ? ColorUtils.blackColor
+            : ColorUtils.scaffoldBackGroundLight,
+        appBar: buildAppBar(isDarkMode),
+        body: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Stack(
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  buildTitle(isDarkMode),
+                  const SizedBox(height: 8),
+                  buildSubTitle(isDarkMode),
+                  const SizedBox(height: 16),
+                  CustomWidgets.customTextField(
+                      hintText: "Enter your email address",
+                      controller: controller.emailController,
+                      isDarkMode: isDarkMode),
+                  const Spacer(),
+                  CustomWidgets.buildGetStartedButton(
+                    onPressed: controller.isLoading.value
+                        ? null
+                        : () {
+                            if (controller.validateEmail(context)) {
+                              controller.forgotPassword(context);
+                            }
+                          },
+                    text: StringUtils.forgot_password_button,
+                  ),
+                ],
               ),
-          ],
+              if (controller.isLoading.value)
+                Container(
+                  color: Colors.black.withValues(alpha: 0.7),
+                  child: CustomWidgets.buildLoader(),
+                ),
+            ],
+          ),
         ),
       ),
     );

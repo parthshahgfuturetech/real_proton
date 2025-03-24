@@ -21,60 +21,61 @@ class SignupScreen extends StatelessWidget {
             MediaQuery.of(context).platformBrightness == Brightness.dark);
     // signUpController.deviceInfo1();
     bool isKeyboardVisible = MediaQuery.of(context).viewInsets.bottom > 0;
-    return Scaffold(
-      backgroundColor: isDarkMode ? Colors.black : const Color(0xffF2F2F2),
-      appBar: buildAppBar(signUpController, isDarkMode),
-      body: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Obx(
-            () => Stack(
-              children: [
-                Column(
-                  children: [
-                    Expanded(
-                      child: SingleChildScrollView(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            buildScreens(context, signUpController, isDarkMode),
-                            buildBasicDetailsFooterText(isDarkMode),
-                            SafeArea(
-                              child: CustomWidgets.buildGetStartedButton(
-                                onPressed: () {
-                                  signUpController.signUp(context);
-                                },
-                                text: "Submit",
+    return SafeArea(
+      top: false,
+      child: Scaffold(
+        backgroundColor: isDarkMode ? Colors.black : const Color(0xffF2F2F2),
+        appBar: buildAppBar(signUpController, isDarkMode),
+        body: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Obx(
+              () => Stack(
+                children: [
+                  Column(
+                    children: [
+                      Expanded(
+                        child: SingleChildScrollView(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              buildScreens(context, signUpController, isDarkMode),
+                              buildBasicDetailsFooterText(isDarkMode),
+                              SafeArea(
+                                child: CustomWidgets.buildGetStartedButton(
+                                  onPressed: () {
+                                    signUpController.signUp(context);
+                                  },
+                                  text: "Submit",
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                    // if (!isKeyboardVisible) ...[
-                    //   buildBasicDetailsFooterText(isDarkMode),
-                    //   SafeArea(
-                    //     child: CustomWidgets.buildGetStartedButton(
-                    //       onPressed: () {
-                    //         signUpController.signUp(context);
-                    //       },
-                    //       text: "Submit",
-                    //     ),
-                    //   ),
-                    // ],
-                  ],
-                ),
-                if (signUpController.isLoading.value)
-                  Container(
-                    color: Colors.black.withOpacity(0.7),
-                    child: const Center(
-                      child: CircularProgressIndicator(),
-                    ),
+                      // if (!isKeyboardVisible) ...[
+                      //   buildBasicDetailsFooterText(isDarkMode),
+                      //   SafeArea(
+                      //     child: CustomWidgets.buildGetStartedButton(
+                      //       onPressed: () {
+                      //         signUpController.signUp(context);
+                      //       },
+                      //       text: "Submit",
+                      //     ),
+                      //   ),
+                      // ],
+                    ],
                   ),
-                CustomWidgets.showNetworkStatus(isDarkMode),
-              ],
+                  if (signUpController.isLoading.value)
+                    Container(
+                      color: Colors.black.withValues(alpha: 0.7),
+                      child: CustomWidgets.buildLoader(),
+                    ),
+                  CustomWidgets.showNetworkStatus(isDarkMode),
+                ],
+              ),
             ),
-          ),
+        ),
       ),
     );
   }

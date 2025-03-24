@@ -112,32 +112,34 @@ class WalletScreen extends StatelessWidget {
   }
 
   Widget buildAssets(bool isDarkMode) {
-    return SingleChildScrollView(
-      child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 15),
-        decoration: BoxDecoration(
-            color: isDarkMode
-                ? ColorUtils.appbarBackgroundDark
-                : ColorUtils.bottomBarLight,
-            border: Border.all(
+    return Obx(
+        ()=> SingleChildScrollView(
+        child: Container(
+          margin: const EdgeInsets.symmetric(horizontal: 15),
+          decoration: BoxDecoration(
               color: isDarkMode
-                  ? ColorUtils.appbarHorizontalLineDark
-                  : ColorUtils.appbarHorizontalLineLight,
-            )),
-        child: Column(
-          children: walletController.assets.map(
-            (e) {
-              return buildAssetsMainData(
-                  image: e["id"] ?? "isEmpty",
-                  isDarkMode: isDarkMode,
-                  title1: e['id'] ?? "isEmpty",
-                  price1: e['balance'] ?? "isEmpty",
-                  title2:
-                      "${e['balance']} ${walletController.buildSortNames(e['id'])} " ??
-                          "isEmpty",
-                  price2: e['conversion'] ?? "isEmpty");
-            },
-          ).toList(),
+                  ? ColorUtils.appbarBackgroundDark
+                  : ColorUtils.bottomBarLight,
+              border: Border.all(
+                color: isDarkMode
+                    ? ColorUtils.appbarHorizontalLineDark
+                    : ColorUtils.appbarHorizontalLineLight,
+              )),
+          child: Column(
+            children: walletController.assets.map(
+              (e) {
+                return buildAssetsMainData(
+                    image: e["id"] ?? "isEmpty",
+                    isDarkMode: isDarkMode,
+                    title1: e['id'] ?? "isEmpty",
+                    price1: e['balance'] ?? "isEmpty",
+                    title2:
+                        "${e['balance']} ${walletController.buildSortNames(e['id'])} " ??
+                            "isEmpty",
+                    price2: e['conversion'] ?? "isEmpty");
+              },
+            ).toList(),
+          ),
         ),
       ),
     );

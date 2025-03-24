@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:real_proton/modules/history/history_controller.dart';
+import 'package:real_proton/modules/history/transfer_history/transfer_history_screen.dart';
 import 'package:real_proton/utils/colors.dart';
 import 'package:real_proton/utils/images.dart';
 import 'package:real_proton/utils/theme.dart';
@@ -18,37 +19,39 @@ class HistoryScreen extends StatelessWidget {
         (themeController.themeMode.value == ThemeMode.system &&
             MediaQuery.of(context).platformBrightness == Brightness.dark);
     return Obx(
-      () => Scaffold(
-        appBar: buildAppBar(isDarkMode),
-        backgroundColor:
-            isDarkMode ? Colors.black : ColorUtils.scaffoldBackGroundLight,
-        body: Stack(
-          children: [
-            if(controller.isLoading.value)...[
-              Container(
-                color: Colors.transparent,
-                child: const Center(
-                  child: CircularProgressIndicator(),
+      () => SafeArea(
+        top: false,
+        child: Scaffold(
+          appBar: buildAppBar(isDarkMode),
+          backgroundColor:
+              isDarkMode ? Colors.black : ColorUtils.scaffoldBackGroundLight,
+          body: Stack(
+            children: [
+              if(controller.isLoading.value)...[
+                Container(
+                  color: Colors.black.withValues(alpha: 0.7),
+                  child: CustomWidgets.buildLoader(),
                 ),
-              )
-            ]else if(controller.transactions.isEmpty)...[
-              const Center(
-                child: Text("No Data Found",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w500,
-                    fontFamily: "Switzer",
-                  ),),
-              ),
-            ]else...[
-              Column(
-                children: [
-                  buildAllTransactions(isDarkMode),
-                ],
-              ),
+              ]else if(controller.transactions.isEmpty)...[
+                const Center(
+                  child: Text("No Data Found",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w500,
+                      fontFamily: "Switzer",
+                    ),
+                  ),
+                ),
+              ]else...[
+                Column(
+                  children: [
+                    buildAllTransactions(isDarkMode),
+                  ],
+                ),
+              ],
             ],
-          ],
+          ),
         ),
       ),
     );
@@ -97,9 +100,9 @@ class HistoryScreen extends StatelessWidget {
         color: isDarkMode
             ? ColorUtils.indicaterGreyLight
             : ColorUtils.appbarHorizontalLineDark,
-        fontWeight: FontWeight.w500,
+        fontWeight: FontWeight.w600,
         fontFamily: "Switzer",
-        fontSize: 20,
+        fontSize: 22,
       ),
     );
   }
@@ -291,11 +294,6 @@ class HistoryScreen extends StatelessWidget {
         const SizedBox(height: 20,),
         buildTitleText("Payment Status"),
         buildFilterSection(controller.paymentStatus,["Paid","Unpaid"]),
-        const SizedBox(height: 15,),
-        Container(height: 2,color: ColorUtils.appbarHorizontalLineDark,),
-        const SizedBox(height: 15,),
-        buildTitleText("Status"),
-        buildFilterSection(controller.paymentOpenAndComplete,["Complete","Open"]),
       ],
     );
   }
@@ -375,7 +373,9 @@ class HistoryScreen extends StatelessWidget {
           final item = controller.transactions[index];
           // double rpAmount = CustomWidgets.weiToRP(item['amount'].toString());
           // String usdAmount = CustomWidgets.rpToUSD(rpAmount);
-          int timestamp = controller.activeTab.value == 0 ? item['createdAt'] ?? "": item['updatedAt'] ?? "";
+          int timestamp =
+          // controller.activeTab.value == 0 ? item['createdAt'] ?? "":
+          item['updatedAt'] ?? "";
           DateTime date = DateTime.fromMillisecondsSinceEpoch(timestamp);
 
           String formattedDate =
@@ -383,8 +383,10 @@ class HistoryScreen extends StatelessWidget {
               "${CustomWidgets.formatHour(date.hour)}:${CustomWidgets.formatMinute(date.minute)} ${CustomWidgets.getPeriod(date.hour)}";
           return GestureDetector(
             onTap: () {
-              // controller.isSuccessAndFailSellAndBuy.value = item['status'] == "Completed";
-              // Get.to(TransferHistoryScreen());
+              if( item['payment_status'] == 'paid'){
+              Get.to(TransferHistoryScreen());
+                controller.isSuccessAndFailSellAndBuy.value = true;
+              }
             },
             child: Card(
               shape: RoundedRectangleBorder(
@@ -419,9 +421,9 @@ class HistoryScreen extends StatelessWidget {
                   title: Row(
                     children: [
                       Text(
-                        controller.activeTab.value == 0
-                            ? item['type'] ?? "Buy"
-                            : item['payment_status'] ?? "Buy",
+                        // controller.activeTab.value == 0
+                        //     ? item['type'] ?? "Buy"
+                             item['payment_status'] ?? "Buy",
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
@@ -436,25 +438,30 @@ class HistoryScreen extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(
                             vertical: 2, horizontal: 6),
                         decoration: BoxDecoration(
-                          color: controller.activeTab.value == 0
-                              ? item['status'] == 'COMPLETED'
-                              ? ColorUtils.statusCompletedColor
-                              :ColorUtils.statusFailColor
-                              : item['payment_status'] == 'paid'
+                          color:
+                          // controller.activeTab.value == 0
+                              // ? item['status'] == 'COMPLETED'
+                              // ? ColorUtils.statusCompletedColor
+                              // :ColorUtils.statusFailColor
+                              // :
+                          item['status'] == 'complete'
                               ? ColorUtils.statusCompletedColor
                               : ColorUtils.statusFailColor,
                           borderRadius: BorderRadius.circular(15),
                         ),
                         child: Text(
-                          controller.activeTab.value == 0
-                              ? item['status']
-                          : item['payment_status'] == 'paid' ? 'COMPLETE' : 'PENDING',
+                          // controller.activeTab.value == 0
+                          //     ? item['status']
+                          // :
+                          item['status'] == 'complete' ? 'COMPLETE' : 'PENDING',
                           style: TextStyle(
-                            color:  controller.activeTab.value == 0
-                                ? item['status'] == 'COMPLETED'
-                                ? ColorUtils.indicaterColor1
-                                :ColorUtils.failSellColor
-                                : item['payment_status'] == 'paid'
+                            color:
+                            // controller.activeTab.value == 0
+                            //     ? item['status'] == 'COMPLETED'
+                            //     ? ColorUtils.indicaterColor1
+                            //     : ColorUtils.failSellColor
+                            //     :
+                            item['status'] == 'complete'
                                 ? ColorUtils.indicaterColor1
                                 : ColorUtils.failSellColor ,
                             fontSize: 10,
@@ -480,9 +487,10 @@ class HistoryScreen extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        controller.activeTab.value == 0 ?
-                        "${item['amount'].toStringAsFixed(2)}"
-                            : "${item['amount_total'].toStringAsFixed(2)}",
+                        // controller.activeTab.value == 0 ?
+                        // "${item['amount'].toStringAsFixed(2)}"
+                        //     :
+                        "${item['amount_total'].toStringAsFixed(2)}",
                         style: TextStyle(
                           fontFamily: "Switzer",
                           fontSize: 14,

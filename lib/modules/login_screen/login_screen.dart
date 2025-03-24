@@ -24,82 +24,83 @@ class LoginScreen extends StatelessWidget {
         final isDarkMode = themeController.themeMode.value == ThemeMode.dark ||
             (themeController.themeMode.value == ThemeMode.system &&
                 MediaQuery.of(context).platformBrightness == Brightness.dark);
-        return Scaffold(
-          appBar: buildAppBar(isDarkMode),
-          backgroundColor:
-              isDarkMode ? Colors.black : ColorUtils.scaffoldBackGroundLight,
-          body: Stack(
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      child: SingleChildScrollView(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const SizedBox(height: 20),
-                            buildLoginText(isDarkMode),
-                            const SizedBox(height: 10),
-                            CustomWidgets.customTextField(
-                              controller: loginController.emailController,
-                              hintText: StringUtils.email,
-                              isDarkMode: isDarkMode,
-                              keyboardType: TextInputType.emailAddress,
-                              textInputAction: TextInputAction.next,
-                            ),
-                            const SizedBox(height: 16),
-                            CustomWidgets.customTextField(
-                              controller: loginController.passwordController,
-                              hintText: StringUtils.password,
-                              isDarkMode: isDarkMode,
-                              isPassword: true,
-                              isPasswordVisible: loginController.isPasswordShow,
-                              onTogglePassword: () => loginController.passwordShow(),
-                              keyboardType: TextInputType.visiblePassword,
-                              textInputAction: TextInputAction.done,
-                            ),
-                            const SizedBox(height: 10),
-                            buildForgotPassword(isDarkMode),
-                          ],
+        return SafeArea(
+          top: false,
+          child: Scaffold(
+            appBar: buildAppBar(isDarkMode),
+            backgroundColor:
+                isDarkMode ? Colors.black : ColorUtils.scaffoldBackGroundLight,
+            body: Stack(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: SingleChildScrollView(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const SizedBox(height: 20),
+                              buildLoginText(isDarkMode),
+                              const SizedBox(height: 10),
+                              CustomWidgets.customTextField(
+                                controller: loginController.emailController,
+                                hintText: StringUtils.email,
+                                isDarkMode: isDarkMode,
+                                keyboardType: TextInputType.emailAddress,
+                                textInputAction: TextInputAction.next,
+                              ),
+                              const SizedBox(height: 16),
+                              CustomWidgets.customTextField(
+                                controller: loginController.passwordController,
+                                hintText: StringUtils.password,
+                                isDarkMode: isDarkMode,
+                                isPassword: true,
+                                isPasswordVisible: loginController.isPasswordShow,
+                                onTogglePassword: () => loginController.passwordShow(),
+                                keyboardType: TextInputType.visiblePassword,
+                                textInputAction: TextInputAction.done,
+                              ),
+                              const SizedBox(height: 10),
+                              buildForgotPassword(isDarkMode),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                    if (!isKeyboardVisible) ...[
-                      CustomWidgets.buildGetStartedButton(
-                          onPressed: loginController.isLoading.value
-                              ? null
-                              : () {
-                                  loginController.login(context);
-                                },
-                          text: StringUtils.login),
-                      const SizedBox(height: 10),
-                      buildGoogleButton(isDarkMode, context,loginController),
-                      buildHaveAccountButtons(isDarkMode,loginController),
-                    ] else ...[
-                      CustomWidgets.buildGetStartedButton(
-                          onPressed: loginController.isLoading.value
-                              ? null
-                              : () {
-                                  loginController.login(context);
-                                },
-                          text: StringUtils.login),
-                      buildHaveAccountButtons(isDarkMode,loginController),
+                      if (!isKeyboardVisible) ...[
+                        CustomWidgets.buildGetStartedButton(
+                            onPressed: loginController.isLoading.value
+                                ? null
+                                : () {
+                                    loginController.login(context);
+                                  },
+                            text: StringUtils.login),
+                        const SizedBox(height: 10),
+                        buildGoogleButton(isDarkMode, context,loginController),
+                        buildHaveAccountButtons(isDarkMode,loginController),
+                      ] else ...[
+                        CustomWidgets.buildGetStartedButton(
+                            onPressed: loginController.isLoading.value
+                                ? null
+                                : () {
+                                    loginController.login(context);
+                                  },
+                            text: StringUtils.login),
+                        buildHaveAccountButtons(isDarkMode,loginController),
+                      ],
                     ],
-                  ],
-                ),
-              ),
-              if (loginController.isLoading.value)
-                Container(
-                  color: Colors.black.withOpacity(0.7),
-                  child: const Center(
-                    child: CircularProgressIndicator(),
                   ),
                 ),
-              CustomWidgets.showNetworkStatus(isDarkMode),
-            ],
+                if (loginController.isLoading.value)
+                  Container(
+                    color: Colors.black.withValues(alpha: 0.7),
+                    child: CustomWidgets.buildLoader(),
+                  ),
+                CustomWidgets.showNetworkStatus(isDarkMode),
+              ],
+            ),
           ),
         );
       },

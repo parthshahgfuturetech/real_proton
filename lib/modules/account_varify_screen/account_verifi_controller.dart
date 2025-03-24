@@ -15,8 +15,7 @@ import 'package:real_proton/utils/widgets.dart';
 
 class AccountVerificationController extends GetxController
     with WidgetsBindingObserver {
-  RxString kycStatus = 'Not Verified'.obs,
-      walletStatus = 'Whitelisted'.obs,
+  RxString kycStatus = ''.obs,
       walletAddress = ''.obs,
       varifationsId = ''.obs,
       userId = ''.obs,
@@ -26,11 +25,12 @@ class AccountVerificationController extends GetxController
       kycReviewAnswer = ''.obs,
       kycRejectType = ''.obs,
       countryCodeNumber = ''.obs,
+      reviewStatus = ''.obs,
       textPhoneNumber = ''.obs;
   RxBool isStartWallet = true.obs,
       isVerifiedEmail = false.obs,
       isPhoneNumberVerified = false.obs,
-      isLoading = false.obs;
+      isLoading = false.obs,isWhiteListed = false.obs;
   bool isEmailVerified = false;
   String chainId = '';
   String assetsId = '';
@@ -102,7 +102,7 @@ class AccountVerificationController extends GetxController
         final Map<String, dynamic> decryptedData = jsonDecode(decryptedText);
 
         kycStatus.value = decryptedData['reviewStatus'];
-
+        reviewStatus.value = decryptedData['reviewStatus'];
         if (decryptedData['reviewResult']['reviewAnswer'] != null) {
           kycReviewAnswer.value = decryptedData['reviewResult']['reviewAnswer'];
         }
@@ -181,7 +181,8 @@ class AccountVerificationController extends GetxController
 
   Future<void> kycUpdateData() async {
     final data = {
-      "kycStatus": kycStatus.value,
+      "kycStatus": kycReviewAnswer.value,
+      "reviewStatus":kycStatus.value,
       "kycMetadata": {
         "reviewResult": {
           "reviewAnswer": kycReviewAnswer.value,
@@ -202,6 +203,7 @@ class AccountVerificationController extends GetxController
         final Map<String, dynamic> decryptedData = jsonDecode(decryptedText);
 
         kycStatus.value = decryptedData['kycStatus'];
+        reviewStatus.value = decryptedData['reviewStatus'];
         kycReviewAnswer.value = decryptedData['kycMetadata']
             ['reviewResult']['reviewAnswer'];
         kycRejectType.value = decryptedData['kycMetadata']
@@ -241,6 +243,7 @@ class AccountVerificationController extends GetxController
         countryCode = ValueNotifier(countryCodeNumber.value);
         kycApplicantId.value = decryptedData['kycApplicationId'];
         kycStatus.value = decryptedData['kycStatus'];
+        reviewStatus.value = decryptedData['reviewStatus'];
         kycReviewAnswer.value =
             decryptedData['kycMetadata']['reviewResult']['reviewAnswer'];
         kycRejectType.value =
@@ -253,6 +256,7 @@ class AccountVerificationController extends GetxController
         }
         userId.value = decryptedData['_id'];
         walletAddress.value = decryptedData['wallets'][0]['walletAddress'];
+        isWhiteListed.value = decryptedData['wallets'][0]['chains'][0]['isWhitelisted'];
       } else {
         isLoading.value = false;
         throw ApiException("Failed to fetch properties.");

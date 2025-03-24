@@ -1,8 +1,11 @@
+import 'dart:convert';
+
 import 'package:get/get.dart';
 import 'package:logger/logger.dart';
 import 'package:real_proton/modules/api_services/api_services.dart';
 import 'package:real_proton/utils/apis.dart';
 import 'package:real_proton/utils/graphql.dart';
+import 'package:real_proton/utils/strings.dart';
 import 'package:real_proton/utils/widgets.dart';
 
 class HistoryController extends GetxController {
@@ -50,11 +53,11 @@ class HistoryController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    if(activeTab.value ==0){
-      fetchTransactionData();
-    }else{
+    // if(activeTab.value ==0){
+    //   fetchTransactionData();
+    // }else{
       fetchFiatData();
-    }
+    // }
   }
 
   void toggleSelection(RxList<String> selectedList, String value) {
@@ -83,14 +86,18 @@ class HistoryController extends GetxController {
 
       final data = {
         "payment_status": paymentStatus[0].toLowerCase(),
+        "limit":10,
+        // "page":1
       };
 
-      final response = await apiService.get(Get.context!, ApiUtils.fiatData,
-          queryParameters: data);
-
+      final response = await apiService.get(Get.context!, ApiUtils.fiatData, queryParameters: data);
       if(response.statusCode == 200){
-        transactions.addAll(response.data['data']['data']);
-        _logger.i("Response Data fiat : ${response.data['data']['data']}");
+        final responseJson = response.data['data'];
+        String decryptedText =
+        CustomWidgets.decryptOpenSSL(responseJson, StringUtils.secretKey);
+        final Map<String, dynamic> decryptedData = jsonDecode(decryptedText);
+        transactions.addAll(decryptedData['data']);
+        _logger.i("-=-=>${decryptedData['data']}");
       }else{
         isLoading.value = false;
         transactions.clear();
@@ -122,8 +129,13 @@ class HistoryController extends GetxController {
           queryParameters: data);
 
       if (response.statusCode == 200) {
-        transactions.addAll(response.data['data']);
-        _logger.i("Response Data: ${response.data}");
+
+        final responseJson = response.data['data'];
+        String decryptedText = CustomWidgets.decryptOpenSSL(responseJson, StringUtils.secretKey);
+        final Map<String, dynamic> decryptedData = jsonDecode(decryptedText);
+
+        transactions.addAll(decryptedData['data']);
+        _logger.i("Response Data: ${decryptedData}");
       } else {
         isLoading.value = false;
         transactions.clear();

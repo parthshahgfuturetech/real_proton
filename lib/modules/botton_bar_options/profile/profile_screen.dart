@@ -69,11 +69,9 @@ class ProfileScreen extends StatelessWidget {
             ),
             if (proController.isLoading.value)
               Container(
-                color: Colors.transparent,
-                child: const Center(
-                  child: CircularProgressIndicator(),
-                ),
-              )
+                color: Colors.black.withValues(alpha: 0.7),
+                child: CustomWidgets.buildLoader(),
+              ),
           ],
         ),
       ),
@@ -435,13 +433,15 @@ class ProfileScreen extends StatelessWidget {
                               ),
                             ),
                             builder: (BuildContext context) {
-                              return Padding(
-                                padding: EdgeInsets.only(
-                                  bottom:
-                                      MediaQuery.of(context).viewInsets.bottom,
+                              return SafeArea(
+                                child: Padding(
+                                  padding: EdgeInsets.only(
+                                    bottom:
+                                        MediaQuery.of(context).viewInsets.bottom,
+                                  ),
+                                  child: buildEditDetailsBottomSheet(
+                                      isDarkMode, proController),
                                 ),
-                                child: buildEditDetailsBottomSheet(
-                                    isDarkMode, proController),
                               );
                             },
                           );

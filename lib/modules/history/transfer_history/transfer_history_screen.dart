@@ -24,21 +24,28 @@ class TransferHistoryScreen extends StatelessWidget {
       backgroundColor:
           isDarkMode ? Colors.black : ColorUtils.scaffoldBackGroundLight,
       appBar: buildAppBar(isDarkMode),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Obx(
-          () => Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              buildTransactionCompleteAndFail(isDarkMode),
-              const SizedBox(height: 32),
-              buildDetailsContainer(isDarkMode),
-              const Spacer(),
-              CustomWidgets.buildGetStartedButton(
-                  text: 'Download', onPressed: () {}),
-
-              // buildDoneButton(isDarkMode),
-            ],
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Obx(
+            () => Column(
+              children: [
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        buildTransactionCompleteAndFail(isDarkMode),
+                        const SizedBox(height: 32),
+                        buildDetailsContainer(isDarkMode),
+                      ],
+                    ),
+                  ),
+                ),
+                CustomWidgets.buildGetStartedButton(
+                    text: 'Download', onPressed: () {}),
+              ],
+            ),
           ),
         ),
       ),
@@ -49,8 +56,17 @@ class TransferHistoryScreen extends StatelessWidget {
     return AppBar(
       scrolledUnderElevation: 0,
       backgroundColor: isDarkMode
-          ? ColorUtils.blackColor
+          ? ColorUtils.appbarBackgroundDark
           : ColorUtils.scaffoldBackGroundLight,
+      bottom: PreferredSize(
+        preferredSize: const Size.fromHeight(4.0),
+        child: Container(
+          color: isDarkMode
+              ? ColorUtils.appbarHorizontalLineDark
+              : ColorUtils.appbarHorizontalLineLight,
+          height: 1.5,
+        ),
+      ),
       leading: IconButton(
         icon: Icon(
           Icons.arrow_back_ios,
@@ -62,7 +78,7 @@ class TransferHistoryScreen extends StatelessWidget {
       centerTitle: true,
       title: Container(
         margin: const EdgeInsets.only(left: 10),
-        child: buildAppBarTitle("Transfer Fund", isDarkMode),
+        child: buildAppBarTitle("Transaction History", isDarkMode),
       ),
     );
   }
@@ -74,9 +90,9 @@ class TransferHistoryScreen extends StatelessWidget {
         color: isDarkMode
             ? ColorUtils.indicaterGreyLight
             : ColorUtils.appbarHorizontalLineDark,
-        fontWeight: FontWeight.w500,
+        fontWeight: FontWeight.w600,
         fontFamily: "Switzer",
-        fontSize: 18,
+        fontSize: 22,
       ),
     );
   }
@@ -137,7 +153,7 @@ class TransferHistoryScreen extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.only(left: 16, right: 16, top: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -145,9 +161,9 @@ class TransferHistoryScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "Buy",
+                    "Transferred",
                     style: TextStyle(
-                        fontSize: 14,
+                        fontSize: 18,
                         fontWeight: FontWeight.w600,
                         fontFamily: "Switzer",
                         color: isDarkMode
@@ -158,92 +174,164 @@ class TransferHistoryScreen extends StatelessWidget {
                     "24 Jul 2024, 8:45 PM",
                     style: TextStyle(
                       color: isDarkMode
-                          ? ColorUtils.whiteColor.withOpacity(0.7)
-                          : ColorUtils.appbarBackgroundDark.withOpacity(0.7),
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
+                          ? ColorUtils.whiteColor
+                          : ColorUtils.appbarBackgroundDark,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w400,
                       fontFamily: "Switzer",
                     ),
                   ),
                 ],
               ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    "125.00 RP",
-                    style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        fontFamily: "Switzer",
-                        color: isDarkMode
-                            ? ColorUtils.whiteColor
-                            : ColorUtils.appbarBackgroundDark),
-                  ),
-                  Text(
-                    "1250.00 USDT",
-                    style: TextStyle(
-                      color: isDarkMode
-                          ? ColorUtils.whiteColor.withOpacity(0.7)
-                          : ColorUtils.appbarBackgroundDark.withOpacity(0.7),
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      fontFamily: "Switzer",
-                    ),
-                  ),
-                ],
-              )
             ],
           ),
         ),
-        Divider(
-            color: isDarkMode
-                ? ColorUtils.whiteColor.withOpacity(0.24)
-                : ColorUtils.appbarHorizontalLineLight),
-        Padding(
-          padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildTransactionDetail('Name', "Parth Shah", isDarkMode),
-              const SizedBox(height: 10),
-              Row(
-                children: [
-                  Flexible(
-                      child: _buildTransactionDetail(
-                          "Wallet",
-                          "0x504f1C1782221194C2cf09BC9620fCC3e6818C55asdsdasdasass",
-                          isDarkMode)),
-                  const SizedBox(width: 8),
-                  GestureDetector(
-                    onTap: () {
-                      Clipboard.setData(const ClipboardData(
-                          text:
-                              "0x504f1C1782221194C2cf09BC9620fCC3e6818C55asdsdasdasass"));
-                    },
-                    child: Image.asset(
-                      ImageUtils.copyImg,
-                      height: 20,
-                      width: 20,
-                      fit: BoxFit.fill,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 10),
-              _buildTransactionDetail(
-                  'Amount', "125.00 RP / 1250.00 USDT", isDarkMode),
-              const SizedBox(height: 10),
-              _buildTransactionDetail(
-                  'Transaction Hash',
-                  "0x504f1C1782221194C2cf09BC9620fCC3e6818C55asdsdasdasass",
-                  isDarkMode,
-                  isLink: true),
-              const SizedBox(height: 10),
-            ],
-          ),
+        Container(
+          height: 2,
+          color: isDarkMode
+              ? ColorUtils.whiteColor.withAlpha(50)
+              : ColorUtils.appbarHorizontalLineLight,
         ),
+        buildCryptoSuccessTransaction(isDarkMode),
       ],
+    );
+  }
+
+  Widget buildCryptoSuccessTransaction(bool isDarkMode) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildTransactionDetail('Name', "Parth Shah", isDarkMode),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              Flexible(
+                child: _buildTransactionDetail(
+                    'From',
+                    "0x504f1C1782221194C2cf09BC9620fCC3e6818C55asdsdasdasass",
+                    isDarkMode),
+              ),
+              const SizedBox(width: 8),
+              GestureDetector(
+                onTap: () {
+                  Clipboard.setData(const ClipboardData(
+                      text:
+                          "0x504f1C1782221194C2cf09BC9620fCC3e6818C55asdsdasdasass"));
+                },
+                child: Image.asset(
+                  ImageUtils.copyImg,
+                  height: 20,
+                  width: 20,
+                  fit: BoxFit.fill,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              Flexible(
+                  child: _buildTransactionDetail(
+                      "To",
+                      "0x504f1C1782221194C2cf09BC9620fCC3e6818C55asdsdasdasass",
+                      isDarkMode)),
+              const SizedBox(width: 8),
+              GestureDetector(
+                onTap: () {
+                  Clipboard.setData(const ClipboardData(
+                      text:
+                          "0x504f1C1782221194C2cf09BC9620fCC3e6818C55asdsdasdasass"));
+                },
+                child: Image.asset(
+                  ImageUtils.copyImg,
+                  height: 20,
+                  width: 20,
+                  fit: BoxFit.fill,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          _buildTransactionDetail(
+              'Amount', "125.00 RP / 1250.00 USDT", isDarkMode),
+          const SizedBox(height: 10),
+          _buildTransactionDetail('Transaction Hash',
+              "0x504f17822211jkjkj94C2cf09BC9620fCC3e68", isDarkMode,
+              isLink: true),
+          const SizedBox(height: 10),
+          _buildTransactionDetail(
+              'Transaction Fee', "0.000365 CELO", isDarkMode),
+          const SizedBox(height: 10),
+        ],
+      ),
+    );
+  }
+
+  Widget buildFiatSuccessTransaction(bool isDarkMode) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildTransactionDetail('Name', "Parth Shah", isDarkMode),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              Flexible(
+                child: _buildTransactionDetail(
+                    'Payment Id',
+                    "0x504f1C1782221194C2cf09BC9620fCC3e6818C55asdsdasdasass",
+                    isDarkMode,
+                    isLink: true),
+              ),
+              const SizedBox(width: 8),
+              GestureDetector(
+                onTap: () {
+                  Clipboard.setData(const ClipboardData(
+                      text:
+                          "0x504f1C1782221194C2cf09BC9620fCC3e6818C55asdsdasdasass"));
+                },
+                child: Image.asset(
+                  ImageUtils.copyImg,
+                  height: 20,
+                  width: 20,
+                  fit: BoxFit.fill,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              Flexible(
+                  child: _buildTransactionDetail(
+                      "Wallet",
+                      "0x504f1C1782221194C2cf09BC9620fCC3e6818C55asdsdasdasass",
+                      isDarkMode)),
+              const SizedBox(width: 8),
+              GestureDetector(
+                onTap: () {
+                  Clipboard.setData(const ClipboardData(
+                      text:
+                          "0x504f1C1782221194C2cf09BC9620fCC3e6818C55asdsdasdasass"));
+                },
+                child: Image.asset(
+                  ImageUtils.copyImg,
+                  height: 20,
+                  width: 20,
+                  fit: BoxFit.fill,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          _buildTransactionDetail(
+              'Amount', "125.00 RP / 1250.00 USDT", isDarkMode),
+          const SizedBox(height: 10),
+        ],
+      ),
     );
   }
 
@@ -314,7 +402,8 @@ class TransferHistoryScreen extends StatelessWidget {
               color: isDarkMode
                   ? ColorUtils.whiteColor
                   : ColorUtils.appbarBackgroundDark,
-              fontSize: 14,
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
               fontFamily: "Switzer",
               overflow: TextOverflow.fade,
               decoration:

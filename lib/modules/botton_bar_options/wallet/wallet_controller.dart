@@ -1,7 +1,10 @@
+import 'dart:convert';
 import 'package:get/get.dart';
 import 'package:logger/logger.dart';
 import 'package:real_proton/modules/api_services/api_services.dart';
 import 'package:real_proton/utils/apis.dart';
+import 'package:real_proton/utils/strings.dart';
+import 'package:real_proton/utils/widgets.dart';
 
 class WalletController extends GetxController {
   var isBalanceShow = false.obs,
@@ -13,10 +16,17 @@ class WalletController extends GetxController {
   final Logger _logger = Logger();
   final ApiService apiService = ApiService();
 
+  // @override
+  // void onInit() {
+  //   // TODO: implement onInit
+  //   super.onInit();
+  //   fetchAssetsData();
+  // }
+
   @override
-  void onInit() {
-    // TODO: implement onInit
-    super.onInit();
+  void onReady() {
+    // TODO: implement onReady
+    super.onReady();
     fetchAssetsData();
   }
 
@@ -31,18 +41,18 @@ class WalletController extends GetxController {
 
   String buildSortImages(String assetsId) {
     switch (assetsId) {
-      case 'RPN_B7ZRVRFH_0GK9':
+      case 'RP_B6TVQTHS_W0V6':
         return 'assets/images/logo-withoutborder.png';
-      case 'ETH_TEST5':
+      case 'ETH-OPT_SEPOLIA':
         return 'assets/images/stroke-rounded-1.png';
-      case 'BSC':
+      case 'BNB_TEST':
         return 'assets/images/stroke-rounded-2.png';
-      case 'POLYGON':
+      case 'AMOY_POLYGON_TEST':
         return 'assets/images/stroke-rounded-3.png';
       case 'CELO_ALF':
         return 'assets/images/stroke-rounded-5.png';
       case 'ARBITRUM':
-        return 'assets/images/image3.png';
+        return 'assets/images/logo-withoutborder.png';
       case 'USDT_B7ZRVRFH_4YOH':
         return 'assets/images/USDT-crypto-icon.png';
       case 'USDC_B7ZRVRFH_4YOH':
@@ -50,21 +60,21 @@ class WalletController extends GetxController {
       case 'USDCDUMMY_B7ZRVRFH_F99R':
         return 'assets/images/USDC-crypto-icon.png';
       case 'USDDUMMY_B7ZRVRFH_K71G':
-        return 'assets/images/image3.png';
+        return 'assets/images/logo-withoutborder.png';
       default:
-        return 'assets/images/default.png';
+        return 'assets/images/logo-withoutborder.png';
     }
   }
 
   String buildSortNames(String assetsId) {
     switch (assetsId) {
-      case 'RPN_B7ZRVRFH_0GK9':
+      case 'RP_B6TVQTHS_W0V6':
         return 'RP';
-      case 'ETH_TEST5':
+      case 'ETH-OPT_SEPOLIA':
         return 'ETH';
-      case 'BSC':
+      case 'BNB_TEST':
         return 'BSC';
-      case 'POLYGON':
+      case 'AMOY_POLYGON_TEST':
         return 'POLYGON';
       case 'CELO_ALF':
         return 'CELO';
@@ -78,6 +88,8 @@ class WalletController extends GetxController {
         return 'USDC';
       case 'USDDUMMY_B7ZRVRFH_K71G':
         return 'USDD';
+      case 'AVAXTEST':
+        return 'AVAXTEST';
       default:
         return 'UnKnowName';
     }
@@ -90,18 +102,22 @@ class WalletController extends GetxController {
           await apiService.get(Get.context!, ApiUtils.walletAssetsData);
 
       if (response.statusCode == 200) {
-        assets.addAll(response.data['vault']['assets']);
-        _logger.i("Api Successfully");
+
+        final responseJson = response.data['vault'];
+        String decryptedText = CustomWidgets.decryptOpenSSL(responseJson, StringUtils.secretKey);
+        final Map<String, dynamic> decryptedData = jsonDecode(decryptedText);
+
+        assets.addAll(decryptedData['assets']);
+        _logger.i("Api Successfully${decryptedData['assets']}");
       } else {
         isLoading.value = false;
         _logger.i("Error in Api:-");
       }
     } catch (e) {
       isLoading.value = false;
-      _logger.i("Error in Api:-");
+      _logger.i("Error in Api:-$e");
     } finally {
       isLoading.value = false;
-      _logger.i("Error in Api:-finally");
     }
   }
 }

@@ -40,7 +40,9 @@ class CustomizedDropdown extends StatelessWidget {
               width: 40,
               child: TextField(
                   controller: controller.textController,
-                  onChanged: controller.calculate,
+                  onChanged: (value) {
+                    controller.calculate(value);
+                  },
                   keyboardType: TextInputType.numberWithOptions(decimal: true),
                   style: TextStyle(
                     fontSize: 18,
@@ -50,7 +52,7 @@ class CustomizedDropdown extends StatelessWidget {
                         : ColorUtils.textFieldBorderColorDark,
                   ),
                   decoration: InputDecoration(
-                    hintText: controller.amount.value.toString(),
+                    hintText: '0.0',
                     border: InputBorder.none,
                   ),
                 ),

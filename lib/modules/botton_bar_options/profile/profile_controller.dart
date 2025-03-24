@@ -11,6 +11,7 @@ import 'package:real_proton/main.dart';
 import 'package:real_proton/modules/account_varify_screen/account_verifi_controller.dart';
 import 'package:real_proton/modules/api_services/api_services.dart';
 import 'package:real_proton/modules/botton_bar_options/bottom_bar/bottomBarController.dart';
+import 'package:real_proton/modules/botton_bar_options/wallet/wallet_controller.dart';
 import 'package:real_proton/modules/login_screen/login_controller.dart';
 import 'package:real_proton/modules/login_screen/login_screen.dart';
 import 'package:real_proton/utils/apis.dart';
@@ -20,7 +21,7 @@ import 'package:real_proton/utils/strings.dart';
 import 'package:real_proton/utils/widgets.dart';
 
 class ProfileController extends GetxController {
-  RxInt progress = 60.obs;
+  RxInt progress = 0.obs;
   RxString kycStatus = 'Pending'.obs,
       firstName = "".obs,
       lastName = "".obs,
@@ -36,7 +37,7 @@ class ProfileController extends GetxController {
   RxBool isLoading = false.obs;
   final ApiService apiServiceClass = ApiService();
   final ImagePicker _picker = ImagePicker();
-  bool permissionGranted = false;
+  bool permissionGranted = false,isEmailVerified = false,isPhoneVerified = false;
 
   @override
   void onInit() {
@@ -147,7 +148,14 @@ class ProfileController extends GetxController {
         emailId.value = decryptedData['email'] ?? '';
         phoneNumber.value = decryptedData['mobileNumber'] ?? '';
         userImage.value = decryptedData['profile'] ?? '';
-
+        isEmailVerified = decryptedData['isEmailVerified'] ?? '';
+        isPhoneVerified = decryptedData['isPhoneVerified'] ?? '';
+        if(isEmailVerified && progress.value < 100){
+            progress.value += 25;
+        }
+        if(isPhoneVerified && progress.value < 100){
+            progress.value += 25;
+        }
         firstNameController.text = firstName.value;
         lastNameController.text = lastName.value;
         walletList = decryptedData['wallets'] ?? [];
@@ -292,6 +300,7 @@ class ProfileController extends GetxController {
         await SharedPreferencesUtil.clear();
         // }
         await Future.delayed(Duration(seconds: 3));
+        Get.delete<WalletController>();
         Get.delete<BottomBarController>();
         Get.delete<ProfileController>(force: true);
         Get.delete<AccountVerificationController>();

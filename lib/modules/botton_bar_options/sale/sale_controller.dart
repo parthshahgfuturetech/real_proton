@@ -13,7 +13,7 @@ class SaleController extends GetxController {
   RxString selectedCurrency = 'USDT'.obs, selectedToken = 'RP'.obs;
   RxDouble usdtBalance = 123.00.obs,
       rpBalance = 125.00.obs,
-      amount = 0.00.obs;
+      amount = 0.00.obs,rePrice = 0.0.obs;
   RxBool isDropdownOpen = false.obs,
         isLoading = false.obs,
       isShowButton = false.obs;
@@ -34,11 +34,10 @@ class SaleController extends GetxController {
   }
 
   void calculate(String value) {
-    double rpAmount = CustomWidgets.weiToRP(blockChainController.tokenPrice.value);
     if (value.isNotEmpty) {
       final double? number = double.tryParse(value);
       if (number != null) {
-        amount.value = (number / rpAmount);
+        amount.value = (number / rePrice.value);
       } else {
         amount.value = 0.0;
       }
@@ -57,6 +56,7 @@ class SaleController extends GetxController {
         "walletAddress": profileController.walletAddress.value,
         "currency": "usd",
         "rpAmount": amount.value,
+        "chainId":"67d136eca768a1161ead69bb",
       };
 
       final response = await apiServiceClass.post(Get.context!,
@@ -64,7 +64,8 @@ class SaleController extends GetxController {
 
       if(response.statusCode == 200){
         _logger.i("Api successful and Stripe api is Step 1");
-        final paymentIntent = response.data['payment']['client_secret'];
+        final paymentIntent = response.data['data']['client_secret'];
+        final idString = response.data['data']['id'];
 
         try {
           await Stripe.instance.initPaymentSheet(
@@ -77,11 +78,9 @@ class SaleController extends GetxController {
 
           _logger.i("Api successful and Stripe api is Step 2");
 
-          await Stripe.instance.presentPaymentSheet();
-          await Stripe.instance.confirmPaymentSheetPayment();
-
-          showSuccessScreen();
-          _logger.i("Payment successful!");
+          await Stripe.instance.presentPaymentSheet().then((val){
+            stripeSuccessApi(idString);
+          });
 
         } catch (e) {
           if (e is StripeException) {
@@ -103,53 +102,40 @@ class SaleController extends GetxController {
     }
   }
 
-  void showSuccessScreen() {
-    Get.to(() => CompleteAndFailScreen());
+  Future<void> stripeSuccessApi(String id) async {
+    isLoading.value = true;
+    try{
+      final data = {
+        "id":id,
+        "payment_method":"pm_card_visa",
+      };
 
-    Future.delayed(Duration(seconds: 3), () {
-      Get.back();
-    });
-  }
+      final response = await apiServiceClass.post(Get.context!,
+          ApiUtils.stripeSuccessAPi,data: data);
 
-  displayPaymentSheet() async {
-    try {
-      await Stripe.instance.presentPaymentSheet().then((value) {
-        showDialog(
-            context: Get.context!,
-            builder: (_) => AlertDialog(
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Row(
-                    children: const [
-                      Icon(
-                        Icons.check_circle,
-                        color: Colors.green,
-                      ),
-                      Text("Payment Successfull"),
-                    ],
-                  ),
-                ],
-              ),
-            ));
-        // ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("paid successfully")));
+      if(response.statusCode == 200){
+        showSuccessScreen();
+        _logger.i("Api Successful");
+      }else{
+        isLoading.value = false;
+        _logger.i("Error in api");
+      }
 
-        // paymentIntent = null;
-      }).onError((error, stackTrace) {
-        print('Error is:--->$error $stackTrace');
-      });
-    } on StripeException catch (e) {
-      print('Error is:---> $e');
-      showDialog(
-          context: Get.context!,
-          builder: (_) => const AlertDialog(
-            content: Text("Cancelled "),
-          ));
-    } catch (e) {
-      print('$e');
+    }catch(e){
+      isLoading.value = false;
+      _logger.i("Error $e");
+    }finally{
+      isLoading.value = false;
     }
   }
 
+  void showSuccessScreen() {
+    Get.to(() => CompleteAndFailScreen());
+
+    // Future.delayed(Duration(seconds: 3), () {
+    //   Get.back();
+    // });
+  }
 
   void selectCurrency(String currency) {
     selectedCurrency.value = currency;

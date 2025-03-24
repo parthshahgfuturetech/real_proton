@@ -17,42 +17,45 @@ class RateUsScreen extends StatelessWidget {
             MediaQuery
                 .of(context)
                 .platformBrightness == Brightness.dark);
-    return Scaffold(
-      backgroundColor:
-      isDarkMode ? Colors.black : ColorUtils.scaffoldBackGroundLight,
-      appBar: buildAppBar(isDarkMode),
-      body: Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: Obx(
-              () =>
-              Column(
-                children: [
-                  Expanded(
-                    child: SingleChildScrollView(
-                      child: Column(
-                        children: [
-                          buildStarContainer(isDarkMode),
-                          SizedBox(height: 16),
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: Text(
-                              'Feedback',
-                              style: TextStyle(
-                                color: isDarkMode ? Colors.white : Colors.black,
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
+    return SafeArea(
+      top: false,
+      child: Scaffold(
+        backgroundColor:
+        isDarkMode ? Colors.black : ColorUtils.scaffoldBackGroundLight,
+        appBar: buildAppBar(isDarkMode),
+        body: Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: Obx(
+                () =>
+                Column(
+                  children: [
+                    Expanded(
+                      child: SingleChildScrollView(
+                        child: Column(
+                          children: [
+                            buildStarContainer(isDarkMode),
+                            SizedBox(height: 16),
+                            Align(
+                              alignment: Alignment.centerLeft,
+                              child: Text(
+                                'Feedback',
+                                style: TextStyle(
+                                  color: isDarkMode ? Colors.white : Colors.black,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ),
-                          ),
-                          SizedBox(height: 8),
-                          buildFeedBackTextField(isDarkMode),
-                        ],
+                            SizedBox(height: 8),
+                            buildFeedBackTextField(isDarkMode),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                  buildSubmitButton(isDarkMode),
-                ],
-              ),
+                    buildSubmitButton(isDarkMode),
+                  ],
+                ),
+          ),
         ),
       ),
     );

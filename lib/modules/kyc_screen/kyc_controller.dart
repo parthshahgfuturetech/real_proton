@@ -56,8 +56,6 @@ class KycController extends GetxController {
         onEvent: (SNSMobileSDKEvent event) {
           _logger.i("event Payload: ${event.payload.values}");
           _logger.i("event ApplicatId: ${event.payload['applicantId']}");
-          _logger.i("Restarted Sdk Status: ${SNSMobileSDKStatus.values}");
-          _logger.i("Restarted Sdk Answer: ${SNSMobileSDKAnswerType.values}");
           kycApplicantId.value = event.payload['applicantId'];
           levelName.value =  event.payload['eventPayload']['levelName'];
           country.value = event.payload['CountryCode'];
@@ -101,7 +99,7 @@ class KycController extends GetxController {
     final data = {
       "kycStatus": reviewStatus.toUpperCase(),
       "kycApplicationId": applicantId,
-      "levelName": levelName,
+      "levelName": selectedNetwork.value,
       "reviewStatus": reviewStatus,
       "kycMetadata": {
         "reviewResult": {

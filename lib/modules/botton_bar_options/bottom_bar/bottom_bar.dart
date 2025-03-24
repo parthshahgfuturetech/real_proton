@@ -26,23 +26,26 @@ class BottomBar extends StatelessWidget {
         final isDarkMode = themeController.themeMode.value == ThemeMode.dark ||
             (themeController.themeMode.value == ThemeMode.system &&
                 MediaQuery.of(context).platformBrightness == Brightness.dark);
-        return Scaffold(
-          appBar: PreferredSize(
-            preferredSize: const Size.fromHeight(kToolbarHeight),
-            child: buildAppBar(context, isDarkMode),
-          ),
-          body: Stack(
-            children: [
-              buildScreens(),
-              if (bottomBarController.kycPending.value) buildKycContainer(),
-            ],
-          ),
-          bottomNavigationBar: Stack(
-            clipBehavior: Clip.none,
-            children: [
-              buildBottomNavigationBarOptions(isDarkMode),
-              buildSalePageOptions(context, isDarkMode),
-            ],
+        return SafeArea(
+          top: false,
+          child: Scaffold(
+            appBar: PreferredSize(
+              preferredSize: const Size.fromHeight(kToolbarHeight),
+              child: buildAppBar(context, isDarkMode),
+            ),
+            body: Stack(
+              children: [
+                buildScreens(),
+                if (bottomBarController.kycPending.value) buildKycContainer(),
+              ],
+            ),
+            bottomNavigationBar: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                buildBottomNavigationBarOptions(isDarkMode),
+                buildSalePageOptions(context, isDarkMode),
+              ],
+            ),
           ),
         );
       },
@@ -259,9 +262,9 @@ class BottomBar extends StatelessWidget {
         color: isDarkMode
             ? ColorUtils.indicaterGreyLight
             : ColorUtils.appbarHorizontalLineDark,
-        fontWeight: FontWeight.w500,
+        fontWeight: FontWeight.w600,
         fontFamily: "Switzer",
-        fontSize: 18,
+        fontSize: 22,
       ),
     );
   }

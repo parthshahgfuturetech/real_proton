@@ -16,7 +16,7 @@ class LeandingScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.black,
       body: SafeArea(
-          bottom: true,
+          top: false,
           child: Stack(
             children: [
               Obx(() {

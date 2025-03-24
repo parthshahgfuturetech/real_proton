@@ -21,185 +21,186 @@ class AccountVerificationScreen extends StatelessWidget {
     final isDarkMode = themeController.themeMode.value == ThemeMode.dark ||
         (themeController.themeMode.value == ThemeMode.system &&
             MediaQuery.of(context).platformBrightness == Brightness.dark);
-    return Scaffold(
-      resizeToAvoidBottomInset: false,
-      appBar: buildAppBar(isDarkMode, accountDetailsController),
-      backgroundColor:
-          isDarkMode ? Colors.black : ColorUtils.scaffoldBackGroundLight,
-      body: Obx(
-        () => Stack(
-          children: [
-            Column(
-              children: [
-                Expanded(
-                  child: RefreshIndicator(
-                    onRefresh: () => accountDetailsController.onRefreshData(),
-                    child: ListView(
-                      physics: const AlwaysScrollableScrollPhysics(),
-                      padding: EdgeInsets.zero,
-                      children: [
-                        const SizedBox(height: 30),
-                        Container(
-                          margin: const EdgeInsets.symmetric(horizontal: 16),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                "Verify Your Email Address",
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w400,
-                                  fontFamily: "Switzer",
-                                  color: isDarkMode
-                                      ? ColorUtils.indicaterGreyLight
-                                      : ColorUtils.appbarHorizontalLineDark,
+    return SafeArea(
+      top: false,
+      child: Scaffold(
+        resizeToAvoidBottomInset: false,
+        appBar: buildAppBar(isDarkMode, accountDetailsController),
+        backgroundColor:
+            isDarkMode ? Colors.black : ColorUtils.scaffoldBackGroundLight,
+        body: Obx(
+          () => Stack(
+            children: [
+              Column(
+                children: [
+                  Expanded(
+                    child: RefreshIndicator(
+                      onRefresh: () => accountDetailsController.onRefreshData(),
+                      child: ListView(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        padding: EdgeInsets.zero,
+                        children: [
+                          const SizedBox(height: 30),
+                          Container(
+                            margin: const EdgeInsets.symmetric(horizontal: 16),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "Verify Your Email Address",
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w400,
+                                    fontFamily: "Switzer",
+                                    color: isDarkMode
+                                        ? ColorUtils.indicaterGreyLight
+                                        : ColorUtils.appbarHorizontalLineDark,
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(height: 8),
-                              buildCustomTextField(
-                                isDarkMode: isDarkMode,
-                                controller:
-                                    accountDetailsController.emailController,
-                                hintText2: "exz@gmail.com",
-                                isVerifiedEmail: accountDetailsController
-                                    .isVerifiedEmail.value,
-                                onTap: accountDetailsController
-                                        .isVerifiedEmail.value
-                                    ? null
-                                    : () {
-                                        accountDetailsController
-                                            .emailVerification(context);
-                                        buildShowDialogBox(
-                                            context, accountDetailsController);
-                                      },
-                              ),
-                              const SizedBox(height: 10),
-                              buildMobileNumberField(
-                                accountDetailsController:
-                                    accountDetailsController,
-                                context: context,
-                                isDarkMode: isDarkMode,
-                                boxDecoration: const BoxConstraints(
-                                  minWidth: 0,
-                                  minHeight: 0,
-                                ),
-                                suffixIcon: GestureDetector(
-                                  behavior: HitTestBehavior.translucent,
+                                const SizedBox(height: 8),
+                                buildCustomTextField(
+                                  isDarkMode: isDarkMode,
+                                  controller:
+                                      accountDetailsController.emailController,
+                                  hintText2: "exz@gmail.com",
+                                  isVerifiedEmail: accountDetailsController
+                                      .isVerifiedEmail.value,
                                   onTap: accountDetailsController
-                                          .isPhoneNumberVerified.value
+                                          .isVerifiedEmail.value
                                       ? null
-                                      : () async {
-                                          FocusScope.of(context).unfocus();
-                                          if (accountDetailsController
-                                              .phoneController.text.isEmpty) {
-                                            CustomWidgets.showError(
-                                                context: context,
-                                                message:
-                                                    "PhoneNumber is Empty");
-                                            return;
-                                          }
-                                          if (accountDetailsController
-                                                  .phoneController.text.length <
-                                              10) {
-                                            CustomWidgets.showError(
-                                                context: context,
-                                                message:
-                                                    "PhoneNumber is invalid");
-                                            return;
-                                          }
-                                          bool isVerified =
-                                              await accountDetailsController
-                                                  .phoneVerificationAPi(
-                                                      context,
-                                                      accountDetailsController
-                                                          .phoneController.text,
-                                                      accountDetailsController
-                                                          .countryCode.value,
-                                                      false);
-                                          if (!isVerified) {
-                                            CustomWidgets.showError(
-                                                context: context,
-                                                message:
-                                                    "Provided Mobile Number is Already Registered");
-                                            return;
-                                          }
-
-                                          accountDetailsController.phoneSendOtp(
-                                              context, isDarkMode,
-                                              mobileNumber:
-                                                  "${accountDetailsController.countryCode.value}${accountDetailsController.phoneController.text}");
+                                      : () {
+                                          accountDetailsController
+                                              .emailVerification(context);
+                                          buildShowDialogBox(
+                                              context, accountDetailsController);
                                         },
-                                  child: accountDetailsController
-                                          .isPhoneNumberVerified.value
-                                      ? Container(
-                                          height: 30,
-                                          margin: const EdgeInsets.symmetric(
-                                              horizontal: 10),
-                                          padding: const EdgeInsets.only(
-                                              top: 5, left: 5, right: 5),
-                                          decoration: const BoxDecoration(
-                                            color: Color.fromRGBO(
-                                                16, 185, 129, 0.45),
-                                          ),
-                                          child: const Text(
-                                            "Verified",
-                                            style: TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w500,
-                                              fontFamily: "Switzer",
-                                              color: Color.fromRGBO(
-                                                  16, 185, 129, 1),
-                                            ),
-                                          ),
-                                        )
-                                      : const Padding(
-                                          padding: EdgeInsets.only(right: 8.0),
-                                          child: Text(
-                                            "Get Code",
-                                            style: TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w500,
-                                              fontFamily: "Switzer",
-                                              color: ColorUtils.loginButton,
-                                            ),
-                                          ),
-                                        ),
                                 ),
-                              ),
-                            ],
+                                const SizedBox(height: 10),
+                                buildMobileNumberField(
+                                  accountDetailsController:
+                                      accountDetailsController,
+                                  context: context,
+                                  isDarkMode: isDarkMode,
+                                  boxDecoration: const BoxConstraints(
+                                    minWidth: 0,
+                                    minHeight: 0,
+                                  ),
+                                  suffixIcon: GestureDetector(
+                                    behavior: HitTestBehavior.translucent,
+                                    onTap: accountDetailsController
+                                            .isPhoneNumberVerified.value
+                                        ? null
+                                        : () async {
+                                            FocusScope.of(context).unfocus();
+                                            if (accountDetailsController
+                                                .phoneController.text.isEmpty) {
+                                              CustomWidgets.showError(
+                                                  context: context,
+                                                  message:
+                                                      "PhoneNumber is Empty");
+                                              return;
+                                            }
+                                            if (accountDetailsController
+                                                    .phoneController.text.length <
+                                                10) {
+                                              CustomWidgets.showError(
+                                                  context: context,
+                                                  message:
+                                                      "PhoneNumber is invalid");
+                                              return;
+                                            }
+                                            bool isVerified =
+                                                await accountDetailsController
+                                                    .phoneVerificationAPi(
+                                                        context,
+                                                        accountDetailsController
+                                                            .phoneController.text,
+                                                        accountDetailsController
+                                                            .countryCode.value,
+                                                        false);
+                                            if (!isVerified) {
+                                              CustomWidgets.showError(
+                                                  context: context,
+                                                  message:
+                                                      "Provided Mobile Number is Already Registered");
+                                              return;
+                                            }
+
+                                            accountDetailsController.phoneSendOtp(
+                                                context, isDarkMode,
+                                                mobileNumber:
+                                                    "${accountDetailsController.countryCode.value}${accountDetailsController.phoneController.text}");
+                                          },
+                                    child: accountDetailsController
+                                            .isPhoneNumberVerified.value
+                                        ? Container(
+                                            height: 30,
+                                            margin: const EdgeInsets.symmetric(
+                                                horizontal: 10),
+                                            padding: const EdgeInsets.only(
+                                                top: 5, left: 5, right: 5),
+                                            decoration: const BoxDecoration(
+                                              color: Color.fromRGBO(
+                                                  16, 185, 129, 0.45),
+                                            ),
+                                            child: const Text(
+                                              "Verified",
+                                              style: TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w500,
+                                                fontFamily: "Switzer",
+                                                color: Color.fromRGBO(
+                                                    16, 185, 129, 1),
+                                              ),
+                                            ),
+                                          )
+                                        : const Padding(
+                                            padding: EdgeInsets.only(right: 8.0),
+                                            child: Text(
+                                              "Get Code",
+                                              style: TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w500,
+                                                fontFamily: "Switzer",
+                                                color: ColorUtils.loginButton,
+                                              ),
+                                            ),
+                                          ),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 30),
-                        Divider(
-                          height: 1.5,
-                          color: isDarkMode
-                              ? ColorUtils.dropDownBackGroundDark
-                              : ColorUtils.appbarHorizontalLineLight,
-                        ),
-                        const SizedBox(height: 30),
-                        buildKycStatusContainer(
-                            isDarkMode, accountDetailsController),
-                        buildWalletStatusContainer(
-                            isDarkMode, accountDetailsController),
-                        const SizedBox(height: 30),
-                        buildEnable2FA(isDarkMode),
-                      ],
+                          const SizedBox(height: 30),
+                          Divider(
+                            height: 1.5,
+                            color: isDarkMode
+                                ? ColorUtils.dropDownBackGroundDark
+                                : ColorUtils.appbarHorizontalLineLight,
+                          ),
+                          const SizedBox(height: 30),
+                          buildKycStatusContainer(
+                              isDarkMode, accountDetailsController),
+                          buildWalletStatusContainer(
+                              isDarkMode, accountDetailsController),
+                          const SizedBox(height: 30),
+                          buildEnable2FA(isDarkMode),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-                buildKycButton(accountDetailsController),
-              ],
-            ),
-            if (accountDetailsController.isLoading.value)
-              Positioned.fill(
-                child: Container(
-                  color: Colors.black.withOpacity(0.7),
-                  child: const Center(
-                    child: CircularProgressIndicator(),
+                  buildKycButton(accountDetailsController),
+                ],
+              ),
+              if (accountDetailsController.isLoading.value)
+                Positioned.fill(
+                  child: Container(
+                    color: Colors.black.withValues(alpha: 0.7),
+                    child: CustomWidgets.buildLoader(),
                   ),
                 ),
-              ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -267,52 +268,41 @@ class AccountVerificationScreen extends StatelessWidget {
             ),
             child: Row(
               children: [
-                GestureDetector(
-                  onTap: accountDetailsController.isPhoneNumberVerified.value
-                      ? () {
-                          return;
-                        }
-                      : null,
-                  child: AbsorbPointer(
-                    absorbing:
-                        accountDetailsController.isPhoneNumberVerified.value,
-                    child: CountryCodePicker(
-                      onChanged: (countryCode) {
-                        accountDetailsController.countryCode.value =
-                            countryCode.dialCode ?? "+1";
-                        print(
-                            "Selected Country Code: ${accountDetailsController.countryCode.value}");
-                        FocusScope.of(context).requestFocus();
-                      },
-                      boxDecoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(1),
-                        color: isDarkMode
-                            ? ColorUtils.blackColor
-                            : ColorUtils.whiteColor,
-                      ),
-                      backgroundColor: isDarkMode
-                          ? ColorUtils.whiteColor
-                          : ColorUtils.blackColor,
-                      flagWidth: 20,
-                      initialSelection:
-                          accountDetailsController.countryCode.value,
-                      showFlag: true,
-                      showDropDownButton: true,
-                      showCountryOnly: false,
-                      showOnlyCountryWhenClosed: false,
-                      searchDecoration: InputDecoration(
-                        hintText: "Search Country code",
-                        hintStyle: TextStyle(
-                          color: isDarkMode ? Colors.white : Colors.black,
-                        ),
-                      ),
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 2, vertical: 10),
-                      textStyle: TextStyle(
-                        color: isDarkMode ? Colors.white : Colors.black,
-                        fontSize: 14,
-                      ),
+                CountryCodePicker(
+                  onChanged: (countryCode) {
+                    accountDetailsController.countryCode.value =
+                        countryCode.dialCode ?? "+1";
+                    print(
+                        "Selected Country Code: ${accountDetailsController.countryCode.value}");
+                    FocusScope.of(context).requestFocus();
+                  },
+                  boxDecoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(1),
+                    color: isDarkMode
+                        ? ColorUtils.blackColor
+                        : ColorUtils.whiteColor,
+                  ),
+                  backgroundColor: isDarkMode
+                      ? ColorUtils.whiteColor
+                      : ColorUtils.blackColor,
+                  flagWidth: 20,
+                  initialSelection:
+                      accountDetailsController.countryCode.value,
+                  showFlag: true,
+                  showDropDownButton: true,
+                  showCountryOnly: false,
+                  showOnlyCountryWhenClosed: false,
+                  searchDecoration: InputDecoration(
+                    hintText: "Search Country code",
+                    hintStyle: TextStyle(
+                      color: isDarkMode ? Colors.white : Colors.black,
                     ),
+                  ),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 2, vertical: 10),
+                  textStyle: TextStyle(
+                    color: isDarkMode ? Colors.white : Colors.black,
+                    fontSize: 14,
                   ),
                 ),
                 Expanded(
@@ -477,29 +467,19 @@ class AccountVerificationScreen extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
             decoration: BoxDecoration(
-              color: accountDetailsController.walletStatus.value ==
-                      'Not Whitelisted'
-                  ? ColorUtils.appbarHorizontalLineDark
-                  : accountDetailsController.walletStatus.value == 'Whitelisted'
-                      ? isDarkMode
-                          ? Colors.grey[800]
-                          : const Color.fromRGBO(237, 248, 242, 1)
-                      : Colors.grey[800],
+              color: accountDetailsController.isWhiteListed.value
+                  ?const Color.fromRGBO(16, 185, 129, 0.45)
+                  : const Color.fromRGBO(63, 63, 70, 1),
             ),
             child: Text(
-              accountDetailsController.walletStatus.value,
+              accountDetailsController.isWhiteListed.value
+                  ? 'Whitelisted' : 'Not Whitelisted',
               style: TextStyle(
-                color: accountDetailsController.walletStatus.value ==
-                        'Not Whitelisted'
-                    ? isDarkMode
-                        ? ColorUtils.darkModeGrey2
-                        : ColorUtils.textFieldBorderColorDark
-                    : accountDetailsController.walletStatus.value ==
-                            'Whitelisted'
-                        ? isDarkMode
-                            ? const Color.fromRGBO(237, 248, 242, 1)
-                            : const Color.fromRGBO(2, 70, 46, 1)
-                        : ColorUtils.darkModeGrey2,
+                color: accountDetailsController.isWhiteListed.value ?
+                     const Color.fromRGBO(16, 185, 129, 1)
+                : const Color.fromRGBO(161, 161, 170, 1),
+                fontFamily: "Switzer",
+                fontWeight: FontWeight.w400,
                 fontSize: 12,
               ),
             ),
@@ -511,12 +491,8 @@ class AccountVerificationScreen extends StatelessWidget {
 
   Widget buildKycStatusContainer(
       bool isDarkMode, AccountVerificationController accountDetailsController) {
-    return GestureDetector(
-      behavior: HitTestBehavior.translucent,
-      onTap: () {
-        // accountDetailsController.kycUpdate();
-      },
-      child: Container(
+    return Obx(
+      ()=> Container(
         margin: const EdgeInsets.symmetric(
           horizontal: 16,
         ),
@@ -587,7 +563,7 @@ class AccountVerificationScreen extends StatelessWidget {
                             accountDetailsController.kycRejectType.value ==
                                 'FINAL')
                         ? "Rejected"
-                        : accountDetailsController.kycStatus.value ==
+                        : accountDetailsController.reviewStatus.value ==
                                 "completed"
                             ? (accountDetailsController.kycReviewAnswer.value ==
                                         'RED' &&
@@ -695,7 +671,7 @@ class AccountVerificationScreen extends StatelessWidget {
     return accountDetailsController.kycStatus.value == "Pending" ||
             accountDetailsController.kycStatus.value == "PENDING" ||
             accountDetailsController.kycStatus.value == "onHold" ||
-            accountDetailsController.kycStatus.value == "completed" &&
+            accountDetailsController.reviewStatus.value == "completed" &&
                 accountDetailsController.kycReviewAnswer.value == 'GREEN' ||
             (accountDetailsController.kycReviewAnswer.value == 'RED' &&
                 accountDetailsController.kycRejectType.value == 'FINAL')

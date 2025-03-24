@@ -21,6 +21,7 @@ class ApiUtils {
   static const fiatData = "$BASE_URL/v1/fiat/user-fiat-transaction";
   static const chainId = "$BASE_URL/v1/chain/";
   static const stripeAPi = "$BASE_URL/v1/stripe/payment_intents";
+  static const stripeSuccessAPi = "$BASE_URL/v1/stripe/payment_intents/confirm";
 
 
   ///Graphql Apis.

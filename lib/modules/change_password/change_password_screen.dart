@@ -21,24 +21,41 @@ class ChangePasswordScreen extends StatelessWidget {
     final isDarkMode = themeController.themeMode.value == ThemeMode.dark ||
         (themeController.themeMode.value == ThemeMode.system &&
             MediaQuery.of(context).platformBrightness == Brightness.dark);
-    return Scaffold(
-      backgroundColor:
-          isDarkMode ? Colors.black : ColorUtils.scaffoldBackGroundLight,
-      appBar: buildAppBar(isDarkMode),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Obx(
-          () => Stack(
-            children: [
-              Column(
-                children: [
-                  Expanded(
-                    child: SingleChildScrollView(
-                      child: Column(
-                        children: [
-                          CustomWidgets.customTextField(
-                              controller: controller.currentPasswordController,
-                              hintText: "Enter Your Current Password",
+    return SafeArea(
+      top: false,
+      child: Scaffold(
+        backgroundColor:
+            isDarkMode ? Colors.black : ColorUtils.scaffoldBackGroundLight,
+        appBar: buildAppBar(isDarkMode),
+        body: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Obx(
+            () => Stack(
+              children: [
+                Column(
+                  children: [
+                    Expanded(
+                      child: SingleChildScrollView(
+                        child: Column(
+                          children: [
+                            CustomWidgets.customTextField(
+                                controller: controller.currentPasswordController,
+                                hintText: "Enter Your Current Password",
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w400,
+                                  fontFamily: "Switzer",
+                                  color: isDarkMode
+                                      ? ColorUtils.indicaterGreyLight
+                                      : ColorUtils.appbarHorizontalLineDark,
+                                ),
+                                textInputAction: TextInputAction.next,
+                                isDarkMode: isDarkMode),
+                            buildForgotPassword(isDarkMode),
+                            CustomWidgets.customTextField(
+                              controller: controller.newPasswordController,
+                              isDarkMode: isDarkMode,
+                              hintText: "Enter Your New Password",
                               style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w400,
@@ -47,96 +64,80 @@ class ChangePasswordScreen extends StatelessWidget {
                                     ? ColorUtils.indicaterGreyLight
                                     : ColorUtils.appbarHorizontalLineDark,
                               ),
-                              textInputAction: TextInputAction.next,
-                              isDarkMode: isDarkMode),
-                          buildForgotPassword(isDarkMode),
-                          CustomWidgets.customTextField(
-                            controller: controller.newPasswordController,
-                            isDarkMode: isDarkMode,
-                            hintText: "Enter Your New Password",
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w400,
-                              fontFamily: "Switzer",
-                              color: isDarkMode
-                                  ? ColorUtils.indicaterGreyLight
-                                  : ColorUtils.appbarHorizontalLineDark,
+                              isPassword: true,
+                              isPasswordVisible: controller.isPasswordShow,
+                              onTogglePassword: () => controller.passwordShow(),
+                              onChangeValue: controller.validatePassword,
                             ),
-                            isPassword: true,
-                            isPasswordVisible: controller.isPasswordShow,
-                            onTogglePassword: () => controller.passwordShow(),
-                            onChangeValue: controller.validatePassword,
-                          ),
-                          CustomWidgets.customTextField(
-                            controller: controller.confirmPasswordController,
-                            isDarkMode: isDarkMode,
-                            hintText: "Confirm Your New Password",
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w400,
-                              fontFamily: "Switzer",
-                              color: isDarkMode
-                                  ? ColorUtils.indicaterGreyLight
-                                  : ColorUtils.appbarHorizontalLineDark,
+                            CustomWidgets.customTextField(
+                              controller: controller.confirmPasswordController,
+                              isDarkMode: isDarkMode,
+                              hintText: "Confirm Your New Password",
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w400,
+                                fontFamily: "Switzer",
+                                color: isDarkMode
+                                    ? ColorUtils.indicaterGreyLight
+                                    : ColorUtils.appbarHorizontalLineDark,
+                              ),
+                              isPassword: true,
+                              isPasswordVisible: controller.isConfirmPasswordShow,
+                              onTogglePassword: () => controller.confirmPasswordShow(),
                             ),
-                            isPassword: true,
-                            isPasswordVisible: controller.isConfirmPasswordShow,
-                            onTogglePassword: () => controller.confirmPasswordShow(),
-                          ),
-                          const SizedBox(height: 10),
-                          buildPasswordStrengthIndicator(isDarkMode),
-                          const SizedBox(height: 10),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              buildValidationItem("At least 1 uppercase",
-                                  controller.hasUppercase.value, isDarkMode),
-                              buildValidationItem(
-                                  "At least 1 number", controller.hasNumber.value, isDarkMode),
-                              buildValidationItem(
-                                  "At least 1 symbol", controller.hasSymbol.value, isDarkMode),
-                              buildValidationItem("At least 8 characters",
-                                  controller.hasMinLength.value, isDarkMode),
-                            ],
-                          ),
-                        ],
+                            const SizedBox(height: 10),
+                            buildPasswordStrengthIndicator(isDarkMode),
+                            const SizedBox(height: 10),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                buildValidationItem("At least 1 uppercase",
+                                    controller.hasUppercase.value, isDarkMode),
+                                buildValidationItem(
+                                    "At least 1 number", controller.hasNumber.value, isDarkMode),
+                                buildValidationItem(
+                                    "At least 1 symbol", controller.hasSymbol.value, isDarkMode),
+                                buildValidationItem("At least 8 characters",
+                                    controller.hasMinLength.value, isDarkMode),
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                  CustomWidgets.buildGetStartedButton(
-                    text: 'Update Password',
-                    textStyle: TextStyle(
-                      color: isDarkMode
+                    CustomWidgets.buildGetStartedButton(
+                      text: 'Update Password',
+                      textStyle: TextStyle(
+                        color: isDarkMode
+                            ? controller.isFormValid.value
+                            ? ColorUtils.whiteColor
+                            : ColorUtils.darkModeGrey2
+                            : controller.isFormValid.value
+                            ? ColorUtils.whiteColor
+                            : ColorUtils.textFieldBorderColorLight,
+                        fontFamily: "Switzer",
+                        fontSize: 16,
+                      ),
+                      backgroundColor: isDarkMode
                           ? controller.isFormValid.value
-                          ? ColorUtils.whiteColor
-                          : ColorUtils.darkModeGrey2
+                          ? ColorUtils.loginButton
+                          : ColorUtils.appbarBackgroundDark
                           : controller.isFormValid.value
-                          ? ColorUtils.whiteColor
-                          : ColorUtils.textFieldBorderColorLight,
-                      fontFamily: "Switzer",
-                      fontSize: 16,
+                          ? ColorUtils.loginButton
+                          : ColorUtils.bottomBarLight,
+                      onPressed: () => controller.isFormValid.value
+                          ? controller.apiChangePassword(context)
+                          : null,
                     ),
-                    backgroundColor: isDarkMode
-                        ? controller.isFormValid.value
-                        ? ColorUtils.loginButton
-                        : ColorUtils.appbarBackgroundDark
-                        : controller.isFormValid.value
-                        ? ColorUtils.loginButton
-                        : ColorUtils.bottomBarLight,
-                    onPressed: () => controller.isFormValid.value
-                        ? controller.apiChangePassword(context)
-                        : null,
-                  ),
-                ],
-              ),
-              if (controller.isLoading.value)
-                Container(
-                  color: Colors.black.withOpacity(0.7),
-                  child: const Center(
-                    child: CircularProgressIndicator(),
-                  ),
+                  ],
                 ),
-            ],
+                if (controller.isLoading.value)
+                  Container(
+                    color: Colors.black.withValues(alpha: 0.7),
+                    child: CustomWidgets.buildLoader(),
+                  ),
+              ],
+            ),
           ),
         ),
       ),

@@ -23,7 +23,15 @@ class SaleScreen extends StatelessWidget {
           ? ColorUtils.blackColor
           : ColorUtils.scaffoldBackGroundLight,
       body: Obx(
-        () => Column(
+        () {
+    saleController.rePrice.value = CustomWidgets.weiToRP(blockChainController.tokenPrice.value);
+    if (saleController.rePrice.value == 0) {
+      return Container(
+        color: Colors.black.withValues(alpha: 0.7),
+        child: Center(child: CustomWidgets.buildLoader()),
+      );
+    }
+          return Column(
           children: [
             const SizedBox(height: 20),
             CustomizedDropdown(),
@@ -34,7 +42,8 @@ class SaleScreen extends StatelessWidget {
               buildSwipButton(buttonWidth, isDarkMode, toggleWidth),
             const SizedBox(height: 20),
           ],
-        ),
+        );
+        },
       ),
     );
   }
@@ -110,11 +119,9 @@ class SaleScreen extends StatelessWidget {
                   CustomWidgets.showInfo(context: Get.context!, message: "Enter Amount");
                 } :(controller) async {
                   controller.loading();
-                  await Future.delayed(const Duration(seconds: 1),(){
                     saleController.stripeApiCall();
-                  });
+                  await Future.delayed(const Duration(seconds: 2));
                   controller.success();
-                  await Future.delayed(const Duration(seconds: 1));
                   controller.reset();
                 },
               ),
