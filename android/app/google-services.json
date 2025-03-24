@@ -15,11 +15,11 @@
       },
       "oauth_client": [
         {
-          "client_id": "967420379280-agn25qdaadfll91edm8s1r4nfe8pevj5.apps.googleusercontent.com",
+          "client_id": "967420379280-s3kjrfoqm0be3adhg89v5vpn94rlfd81.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.example.real_proton",
-            "certificate_hash": "d82b0e7b147dabfb773bf627be6f7b6115e385ea"
+            "certificate_hash": "d884d5365cb0905d1b6faff62ec3b558e5d34928"
           }
         },
         {

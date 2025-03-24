@@ -114,7 +114,11 @@ class SaleController extends GetxController {
           ApiUtils.stripeSuccessAPi,data: data);
 
       if(response.statusCode == 200){
-        showSuccessScreen();
+        final responseJson = response.data;
+
+        print("stripeSuccessApi==> ${responseJson}");
+
+        showSuccessScreen(responseJson);
         _logger.i("Api Successful");
       }else{
         isLoading.value = false;
@@ -129,12 +133,12 @@ class SaleController extends GetxController {
     }
   }
 
-  void showSuccessScreen() {
-    Get.to(() => CompleteAndFailScreen());
-
-    // Future.delayed(Duration(seconds: 3), () {
-    //   Get.back();
-    // });
+  void showSuccessScreen(dynamic responseJson) {
+    if (responseJson != null && responseJson is Map<String, dynamic>) {
+      Get.to(() => CompleteAndFailScreen(responseJson: responseJson));
+    } else {
+      print("Error: responseJson is null or not a valid Map");
+    }
   }
 
   void selectCurrency(String currency) {

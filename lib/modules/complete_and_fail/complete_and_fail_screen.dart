@@ -7,11 +7,14 @@ import 'package:real_proton/utils/images.dart';
 import '../../utils/widgets.dart';
 
 class CompleteAndFailScreen extends StatelessWidget {
-  CompleteAndFailScreen({super.key});
+  final Map<String, dynamic> responseJson;
+CompleteAndFailScreen({required this.responseJson, Key? key}) : super(key: key);
 
-  @override
+@override
   Widget build(BuildContext context) {
-    return Obx(
+  print("Received responseJson==: $responseJson"); // Debugging line
+
+  return Obx(
       ()=> Scaffold(
         body: SafeArea(
           bottom: true,
@@ -46,6 +49,23 @@ class CompleteAndFailScreen extends StatelessWidget {
   }
 
   Widget buildComplete() {
+    String formattedDate = "N/A"; // Default value to prevent uninitialized error
+
+    int timestamp = responseJson['data']['updatedAt']; // Ensure it's an int
+
+    if (timestamp > 0) {
+      DateTime date = DateTime.fromMillisecondsSinceEpoch(timestamp);
+
+                                   formattedDate =
+          "${date.day} ${CustomWidgets.getMonthName(date.month)} ${date.year}, "
+          "${CustomWidgets.formatHour(date.hour)}:${CustomWidgets.formatMinute(date.minute)} ${CustomWidgets.getPeriod(date.hour)}";
+
+      print(formattedDate); // Check the output
+    } else {
+      print("Invalid timestamp");
+    }
+
+
     return Column(
       children: [
         Expanded(
@@ -67,39 +87,7 @@ class CompleteAndFailScreen extends StatelessWidget {
             ),
           ),
         ),
-        // Container(
-        //   height: 30,
-        //   width: double.infinity,
-        //   alignment: Alignment.center,
-        //   color: ColorUtils.completeGreenColor,
-        //   child: Text(
-        //     "Your Tokens Are Locked For 90 Days!",
-        //     style: TextStyle(
-        //       fontSize: 13,
-        //       fontFamily: "Switzer",
-        //       fontWeight: FontWeight.w500,
-        //     ),
-        //   ),
-        // ),
-        // Container(
-        //   height: 50,
-        //   width: double.infinity,
-        //   margin: EdgeInsets.symmetric(horizontal: 20, vertical: 13),
-        //   decoration: BoxDecoration(color: Colors.white),
-        //   child: GestureDetector(
-        //     onTap: () {
-        //       completeAndFailController.isCompleteAndFail.value = false;
-        //     },
-        //     child: Center(
-        //       child: Text(
-        //         "View All Transactions",
-        //         style: TextStyle(
-        //           color: ColorUtils.indicaterColor1,
-        //         ),
-        //       ),
-        //     ),
-        //   ),
-        // ),
+
 
         SizedBox(height: 20),
 
@@ -136,10 +124,10 @@ class CompleteAndFailScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                buildTransactionDetail("Amount", "\$180.00"),
-                buildTransactionDetail("Expected RP Token", "15.00 RP"),
-                buildTransactionDetail("Transaction Id", "0x..hbdvdvndvndvbdjvnd"),
-                buildTransactionDetail("Date & Time", "January 11, 2025, 3:45 PM UTC"),
+                buildTransactionDetail("Amount", "\$${responseJson['data']['txnAmount']}"),
+                buildTransactionDetail("Expected RP Token", "${responseJson['data']['rpAmount']}"),
+                buildTransactionDetail("Transaction Id", "${responseJson['data']['paymentId']}"),
+                buildTransactionDetail("Date & Time", formattedDate),
               ],
             ),
           ),

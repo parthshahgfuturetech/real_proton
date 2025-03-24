@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:get/get.dart';
 import 'package:logger/logger.dart';
 import 'package:real_proton/modules/api_services/api_services.dart';
+import 'package:real_proton/modules/history/transfer_history/transfer_history_screen.dart';
 import 'package:real_proton/utils/apis.dart';
 import 'package:real_proton/utils/graphql.dart';
 import 'package:real_proton/utils/strings.dart';
@@ -16,33 +17,7 @@ class HistoryController extends GetxController {
   var transactions = [].obs;
   final Logger _logger = Logger();
   final ApiService apiService = ApiService();
-  final lockInHistory = [
-    {
-      "amount": "150 RP",
-      "date": "23 Dec 2024, 10:15 PM",
-      "unlockIn": "90 Days"
-    },
-    {
-      "amount": "150 RP",
-      "date": "30 Jul 2024, 10:15 PM",
-      "unlockIn": "85 Days"
-    },
-    {
-      "amount": "150 RP",
-      "date": "30 Jul 2024, 10:15 PM",
-      "unlockIn": "76 Days"
-    },
-    {
-      "amount": "150 RP",
-      "date": "30 Jul 2024, 10:15 PM",
-      "unlockIn": "10 Days"
-    },
-    {
-      "amount": "150 RP",
-      "date": "26 Sep 2024, 10:15 PM",
-      "unlockIn": "03 Days"
-    },
-  ];
+
   var transactionType = ["All"].obs;
   var method = [""].obs;
   var status = [""].obs;
@@ -131,6 +106,9 @@ class HistoryController extends GetxController {
       if (response.statusCode == 200) {
 
         final responseJson = response.data['data'];
+
+        print("fetchTransactionData:==>$fetchTransactionData");
+
         String decryptedText = CustomWidgets.decryptOpenSSL(responseJson, StringUtils.secretKey);
         final Map<String, dynamic> decryptedData = jsonDecode(decryptedText);
 
@@ -148,4 +126,45 @@ class HistoryController extends GetxController {
       isLoading.value = false;
     }
   }
+
+
+
+
+  Future<void> fetchFiatDetailData(paymentId, firstName)async {
+    print("paymentId:==$paymentId");
+    try{
+      isLoading.value = true;
+      final data = {
+        "paymentId":"$paymentId",
+      };
+
+      final response = await apiService.get(Get.context!,
+          ApiUtils.fiatDetailApi,queryParameters: data);
+
+      if(response.statusCode == 200){
+        final responseJson = response.data['data'];
+
+
+        String decryptedText = CustomWidgets.decryptOpenSSL(responseJson, StringUtils.secretKey);
+        final Map<String, dynamic> decryptedData = jsonDecode(decryptedText);
+        // print("fetchFiatDetailData:==>>  $decryptedData");
+
+        // print("-=-=>${decryptedData['status']}");
+
+       if(decryptedData['status']=='complete'){
+         isSuccessAndFailSellAndBuy.value = true;
+
+       }else {
+         isSuccessAndFailSellAndBuy.value = false;
+       }
+        Get.to(TransferHistoryScreen(decryptedData:decryptedData,firstName: firstName,));
+
+      }else{
+        isLoading.value = false;
+      }
+    }catch(e){
+
+    }finally{
+      isLoading.value = false;
+    }}
 }

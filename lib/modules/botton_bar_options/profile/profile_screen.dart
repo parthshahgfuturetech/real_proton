@@ -22,6 +22,7 @@ import '../../create_your_pin_screen/create_your_pin_screen.dart';
 class ProfileScreen extends StatelessWidget {
   ProfileScreen({super.key});
 
+
   @override
   Widget build(BuildContext context) {
     final LoginController loginController = Get.put(LoginController());
@@ -51,6 +52,7 @@ class ProfileScreen extends StatelessWidget {
                     isDarkMode
                         ? proController.profileDarkImageDark
                         : proController.profileLightImageLight,
+                    proController
                   ),
                   buildSectionHeader('App Settings'),
                   buildAccountAndAppMainContainer(
@@ -58,7 +60,7 @@ class ProfileScreen extends StatelessWidget {
                     proController.profileAppSettingItems,
                     isDarkMode
                         ? proController.profileAppSettingsDarkImageDark
-                        : proController.profileAppSettingsLightImageLight,
+                        : proController.profileAppSettingsLightImageLight,proController
                   ),
                   const SizedBox(height: 20),
                   buildLogoutButton(context, loginController, proController),
@@ -112,6 +114,7 @@ class ProfileScreen extends StatelessWidget {
     bool isDarkMode,
     List<Map<String, dynamic>> items,
     List<String> imagePaths,
+      ProfileController prController
   ) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 15),
@@ -137,7 +140,7 @@ class ProfileScreen extends StatelessWidget {
             imagePath: imagePath,
             isDarkMode: isDarkMode,
             onTap: () {
-              handleTap(item['title']);
+              handleTap(item['title'],prController );
             },
           );
         }),
@@ -145,7 +148,7 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  void handleTap(String title) {
+  void handleTap(String title,ProfileController prController) {
     if (title == "Account Verification") {
       Get.to(() => AccountVerificationScreen())!.then((value) {
         print("hello accout$value");
@@ -172,7 +175,7 @@ class ProfileScreen extends StatelessWidget {
     } else if (title == 'Help & Support') {
       Get.to(() => HelpSupportScreen());
     } else if (title == 'Transaction History') {
-      Get.to(() => HistoryScreen());
+      Get.to(() => HistoryScreen("${prController.firstName.value} ${prController.lastName.value}"));
     } else {
       Get.snackbar(
         "Action",

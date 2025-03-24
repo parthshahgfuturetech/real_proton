@@ -6,9 +6,16 @@ import 'package:real_proton/utils/colors.dart';
 import 'package:real_proton/utils/images.dart';
 import 'package:real_proton/utils/theme.dart';
 import 'package:real_proton/utils/widgets.dart';
+class HistoryScreen extends StatefulWidget {
+  final String firstName;
 
-class HistoryScreen extends StatelessWidget {
-  HistoryScreen({super.key});
+  HistoryScreen(this.firstName);
+
+  @override
+  _HistoryScreenState createState() => _HistoryScreenState();
+}
+
+class _HistoryScreenState extends State<HistoryScreen> {
 
   final HistoryController controller = Get.put(HistoryController());
   final ThemeController themeController = Get.find();
@@ -383,9 +390,8 @@ class HistoryScreen extends StatelessWidget {
               "${CustomWidgets.formatHour(date.hour)}:${CustomWidgets.formatMinute(date.minute)} ${CustomWidgets.getPeriod(date.hour)}";
           return GestureDetector(
             onTap: () {
-              if( item['payment_status'] == 'paid'){
-              Get.to(TransferHistoryScreen());
-                controller.isSuccessAndFailSellAndBuy.value = true;
+              if(item['status'] == 'complete'){
+                controller.fetchFiatDetailData(item['paymentId'], widget.firstName);
               }
             },
             child: Card(

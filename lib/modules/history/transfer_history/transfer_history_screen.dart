@@ -10,13 +10,21 @@ import 'package:real_proton/utils/theme.dart';
 import 'package:real_proton/utils/widgets.dart';
 
 class TransferHistoryScreen extends StatelessWidget {
-  TransferHistoryScreen({super.key});
+  final Map<String, dynamic> decryptedData;
+  final String firstName; // Make sure it's explicitly typed
 
+  TransferHistoryScreen({
+    required this.decryptedData,
+    required this.firstName,
+    Key? key
+  }) : super(key: key);
   final ThemeController themeController = Get.find();
   final HistoryController controller = Get.put(HistoryController());
 
   @override
   Widget build(BuildContext context) {
+    print("TransferHistoryScreen decryptedData==: $decryptedData $firstName"); // Debugging line
+
     final isDarkMode = themeController.themeMode.value == ThemeMode.dark ||
         (themeController.themeMode.value == ThemeMode.system &&
             MediaQuery.of(context).platformBrightness == Brightness.dark);
@@ -149,6 +157,21 @@ class TransferHistoryScreen extends StatelessWidget {
   }
 
   Widget buildSuccessDetails(bool isDarkMode) {
+    String formattedDate = "N/A"; // Default value to prevent uninitialized error
+
+    int timestamp = decryptedData['createdAt']; // Ensure it's an int
+
+    if (timestamp > 0) {
+      DateTime date = DateTime.fromMillisecondsSinceEpoch(timestamp);
+
+      formattedDate =
+      "${date.day} ${CustomWidgets.getMonthName(date.month)} ${date.year}, "
+          "${CustomWidgets.formatHour(date.hour)}:${CustomWidgets.formatMinute(date.minute)} ${CustomWidgets.getPeriod(date.hour)}";
+
+      print(formattedDate); // Check the output
+    } else {
+      print("Invalid timestamp");
+    }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -171,7 +194,7 @@ class TransferHistoryScreen extends StatelessWidget {
                             : ColorUtils.appbarBackgroundDark),
                   ),
                   Text(
-                    "24 Jul 2024, 8:45 PM",
+                    "${formattedDate}",
                     style: TextStyle(
                       color: isDarkMode
                           ? ColorUtils.whiteColor
@@ -192,7 +215,7 @@ class TransferHistoryScreen extends StatelessWidget {
               ? ColorUtils.whiteColor.withAlpha(50)
               : ColorUtils.appbarHorizontalLineLight,
         ),
-        buildCryptoSuccessTransaction(isDarkMode),
+        buildFiatSuccessTransaction(isDarkMode),
       ],
     );
   }
@@ -270,19 +293,20 @@ class TransferHistoryScreen extends StatelessWidget {
   }
 
   Widget buildFiatSuccessTransaction(bool isDarkMode) {
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildTransactionDetail('Name', "Parth Shah", isDarkMode),
+          _buildTransactionDetail('Name', firstName, isDarkMode),
           const SizedBox(height: 10),
           Row(
             children: [
               Flexible(
                 child: _buildTransactionDetail(
                     'Payment Id',
-                    "0x504f1C1782221194C2cf09BC9620fCC3e6818C55asdsdasdasass",
+                    "${decryptedData['paymentId']}",
                     isDarkMode,
                     isLink: true),
               ),
@@ -328,7 +352,7 @@ class TransferHistoryScreen extends StatelessWidget {
           ),
           const SizedBox(height: 10),
           _buildTransactionDetail(
-              'Amount', "125.00 RP / 1250.00 USDT", isDarkMode),
+              'Amount', "\$ ${decryptedData['amount_total']}", isDarkMode),
           const SizedBox(height: 10),
         ],
       ),

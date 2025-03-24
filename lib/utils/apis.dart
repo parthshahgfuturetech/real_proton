@@ -22,8 +22,7 @@ class ApiUtils {
   static const chainId = "$BASE_URL/v1/chain/";
   static const stripeAPi = "$BASE_URL/v1/stripe/payment_intents";
   static const stripeSuccessAPi = "$BASE_URL/v1/stripe/payment_intents/confirm";
-
-
+  static const fiatDetailApi = "$BASE_URL/v1/fiat/user-fiat-transaction-detail";
   ///Graphql Apis.
   static const transactionHistory = "https://api.studio.thegraph.com/query/89202/proton-token-3643-celo/version/latest";
 
