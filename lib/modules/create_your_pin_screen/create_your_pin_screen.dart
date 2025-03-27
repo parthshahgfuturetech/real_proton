@@ -28,7 +28,7 @@ class _CreateYourPinScreenState extends State<CreateYourPinScreen> {
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
-          mainAxisSize: MainAxisSize.min, // ✅ Prevents expansion
+          mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             // Logo
@@ -66,11 +66,10 @@ class _CreateYourPinScreenState extends State<CreateYourPinScreen> {
                       shape: BoxShape.circle,
                       border: Border.all(
                         color: isFilled
-                            ? ColorUtils.loginButton // Border color when filled
-                            : (isCurrent ? ColorUtils.appbarHorizontalLineDark : Colors.grey.withOpacity(0.5)), // Lighter for upcoming
-                        width: 1.5,
+                            ? ColorUtils.loginButton
+                            : (isCurrent ? ColorUtils.appbarHorizontalLineDark : Colors.grey.withOpacity(0.5)),
                       ),
-                      color: isFilled ? Colors.white : Colors.transparent, // Fill when entered
+                      color: isFilled ? Colors.white : Colors.transparent,
                     ),
                   );
                 }),
@@ -79,7 +78,7 @@ class _CreateYourPinScreenState extends State<CreateYourPinScreen> {
             const Spacer(),
             // Number Pad
             buildContainerGradient(),
-            buildNumberPad(),
+            buildNumberPad(isDarkMode),
 
           ],
         ),
@@ -117,7 +116,7 @@ class _CreateYourPinScreenState extends State<CreateYourPinScreen> {
     );
   }
 
-  Widget buildNumberPad() {
+  Widget buildNumberPad(isDarkMode) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: Container(
@@ -135,7 +134,7 @@ class _CreateYourPinScreenState extends State<CreateYourPinScreen> {
                 children: row.map((text) {
                   return text.isEmpty
                       ? const SizedBox(width: 92)
-                      : buildNumberButton(text);
+                      : buildNumberButton(text,isDarkMode);
                 }).toList(),
               ),
           ],
@@ -144,7 +143,7 @@ class _CreateYourPinScreenState extends State<CreateYourPinScreen> {
     );
   }
 
-  Widget buildNumberButton(String text) {
+  Widget buildNumberButton(String text, isDarkMode) {
     return GestureDetector(
       onTap: () {
         if (text == '⌫') {
@@ -169,7 +168,7 @@ class _CreateYourPinScreenState extends State<CreateYourPinScreen> {
                 style: TextStyle(
                   fontSize: 26,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  color: isDarkMode ? Colors.white : ColorUtils.blackColor
                 ),
               ),
       ),

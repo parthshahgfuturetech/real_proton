@@ -10,11 +10,15 @@ import 'package:real_proton/modules/api_services/api_services.dart';
 import 'package:real_proton/modules/kyc_screen/kyc_controller.dart';
 import 'package:real_proton/utils/apis.dart';
 import 'package:real_proton/utils/colors.dart';
+import 'package:real_proton/utils/shared_preference.dart';
 import 'package:real_proton/utils/strings.dart';
 import 'package:real_proton/utils/widgets.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AccountVerificationController extends GetxController
     with WidgetsBindingObserver {
+  RxInt progressVal = 0.obs;
+
   RxString kycStatus = ''.obs,
       walletAddress = ''.obs,
       varifationsId = ''.obs,
@@ -30,7 +34,8 @@ class AccountVerificationController extends GetxController
   RxBool isStartWallet = true.obs,
       isVerifiedEmail = false.obs,
       isPhoneNumberVerified = false.obs,
-      isLoading = false.obs,isWhiteListed = false.obs;
+      isLoading = false.obs,
+      isWhiteListed = false.obs;
   bool isEmailVerified = false;
   String chainId = '';
   String assetsId = '';
@@ -68,32 +73,34 @@ class AccountVerificationController extends GetxController
   void didChangeAppLifecycleState(AppLifecycleState state) {
     switch (state) {
       case AppLifecycleState.resumed:
-        debugPrint("App Resumed - Restoring Data");
+        _logger.i("App Resumed - Restoring Data");
         if (isEmailVerified || kycController.isKycDone) {
           saveData();
           // kycController.isKycDone = false;
         }
         break;
       case AppLifecycleState.inactive:
-        debugPrint("App inactive - Restoring Data");
+        _logger.i("App inactive - Restoring Data");
         break;
       case AppLifecycleState.paused:
-        debugPrint("App paused - Restoring Data");
+        _logger.i("App paused - Restoring Data");
         break;
       case AppLifecycleState.detached:
-        debugPrint("App detached - Restoring Data");
+        _logger.i("App detached - Restoring Data");
         break;
       case AppLifecycleState.hidden:
-        debugPrint("App hidden - Restoring Data");
+        _logger.i("App hidden - Restoring Data");
         break;
     }
   }
 
   Future<void> kycUpdate() async {
     try {
+      _logger.i("AccountVerificationController-kycUpdate:============");
+
       isLoading.value = true;
       final response = await apiServiceClass.get(Get.context!,
-          "https://api.realproton.com/v1/sumsub/applicant-status/${kycApplicantId.value}");
+          "${ApiUtils.kycUpdate}/${kycApplicantId.value}");
 
       if (response.statusCode == 200) {
         final responseJson = response.data;
@@ -110,6 +117,8 @@ class AccountVerificationController extends GetxController
           kycRejectType.value =
               decryptedData['reviewResult']['reviewRejectType'];
         }
+
+
         if (kycReviewAnswer.value == 'GREEN') {
           bottomBarController.kycPending.value = false;
           saleController.isShowButton.value = true;
@@ -123,16 +132,22 @@ class AccountVerificationController extends GetxController
           saleController.isShowButton.value = false;
           walletController.isTransactionHistoryShow.value = false;
         }
-        _logger.i("sumsub status APi Done");
+
+        if(isWhiteListed.value==false){
+          bottomBarController.kycPending.value = true;
+        }else{
+          bottomBarController.kycPending.value = false;
+        }
+       _logger.i("sumsub status APi Done");
         kycUpdateData();
       } else {
         isLoading.value = false;
-        _logger.i("sumsub status APi not Done");
+       _logger.i("sumsub status APi not Done");
         throw ApiException("Failed to fetch properties.");
       }
     } catch (e) {
       isLoading.value = false;
-      _logger.i("Error :--${e.toString()}");
+     _logger.i("Error :--${e.toString()}");
     } finally {
       isLoading.value = false;
     }
@@ -152,12 +167,12 @@ class AccountVerificationController extends GetxController
         chainId = decryptedData[0]['_id'];
         assetsId = decryptedData[0]['chainId'];
 
-        _logger.i("ChainId is Successfully");
+       _logger.i("ChainId is Successfully");
       }else{
-        _logger.i("ChainId is not Successfully");
+       _logger.i("ChainId is not Successfully");
       }
     }catch(e){
-      _logger.i("ChainId is not Successfully $e");
+     _logger.i("ChainId is not Successfully $e");
     }
   }
 
@@ -170,12 +185,18 @@ class AccountVerificationController extends GetxController
       final response = await apiServiceClass
           .post(Get.context!, ApiUtils.createWallet, data: data);
       if (response.statusCode == 200) {
-        _logger.i("Successfully Create Wallet Address");
+
+        _logger.i("createWalletApi===>${response.data['vault']['walletAddress']}");
+        String walletAddress = response.data['vault']['walletAddress'];
+        await SharedPreferencesUtil.setString('walletAddress', walletAddress);
+        _logger.i("walletAddress===>${walletAddress}");
+
+       _logger.i("Successfully Create Wallet Address");
       } else {
-        _logger.i("Error during Create Wallet Address");
+       _logger.i("Error during Create Wallet Address");
       }
     } catch (e) {
-      _logger.i("Error during Create Wallet Address");
+     _logger.i("Error during Create Wallet Address");
     }
   }
 
@@ -208,14 +229,14 @@ class AccountVerificationController extends GetxController
             ['reviewResult']['reviewAnswer'];
         kycRejectType.value = decryptedData['kycMetadata']
             ['reviewResult']['reviewRejectType'];
-        _logger.i("Kyc Data Update successful");
+       _logger.i("Kyc Data Update successful");
       } else {
         isLoading.value = false;
-        _logger.i("Error during Kyc else");
+       _logger.i("Error during Kyc else");
       }
     } catch (e) {
       isLoading.value = false;
-      _logger.i("Error during Kyc verification: $e");
+     _logger.i("Error during Kyc verification: $e");
     } finally {
       isLoading.value = false;
     }
@@ -224,6 +245,7 @@ class AccountVerificationController extends GetxController
   Future<void> saveData() async {
     try {
       isLoading.value = true;
+      _logger.i("saveData---> calllinggggggggggggg");
       final response =
           await apiServiceClass.get(Get.context!, ApiUtils.userDetails);
       if (response.statusCode == 200) {
@@ -234,6 +256,24 @@ class AccountVerificationController extends GetxController
 
         isVerifiedEmail.value = decryptedData['isEmailVerified'];
         isPhoneNumberVerified.value = decryptedData['isPhoneVerified'];
+        _logger.i("After assignment: isVerifiedEmail=${isVerifiedEmail.value}, isPhoneNumberVerified=${isPhoneNumberVerified.value}");
+
+
+
+        if (isVerifiedEmail.value) {
+          _logger.i("✅ Entered Email Verified Condition");
+          progressVal.value += 25;
+        } else {
+          _logger.i("❌ isVerifiedEmail is FALSE, not adding progress.");
+        }
+
+        if (isPhoneNumberVerified.value) {
+          _logger.i("✅ Entered Phone Verified Condition");
+          progressVal.value += 25;
+        } else {
+          _logger.i("❌ isPhoneNumberVerified is FALSE, not adding progress.");
+        }
+
         emailId.value = decryptedData['email'];
         phoneNumber.value = decryptedData['mobileNumber'];
         countryCodeNumber.value = decryptedData['countryCode'];
@@ -244,8 +284,16 @@ class AccountVerificationController extends GetxController
         kycApplicantId.value = decryptedData['kycApplicationId'];
         kycStatus.value = decryptedData['kycStatus'];
         reviewStatus.value = decryptedData['reviewStatus'];
+
+
         kycReviewAnswer.value =
             decryptedData['kycMetadata']['reviewResult']['reviewAnswer'];
+        if (kycReviewAnswer.value == 'GREEN') {
+          _logger.i("✅ Entered kycReviewAnswer Verified Condition");
+          progressVal.value += 25;
+        } else {
+          _logger.i("❌ kycReviewAnswer is NOT GREEN, no progress added.");
+        }
         kycRejectType.value =
             decryptedData['kycMetadata']['reviewResult']['reviewRejectType'];
         kycUpdate();
@@ -257,10 +305,22 @@ class AccountVerificationController extends GetxController
         userId.value = decryptedData['_id'];
         walletAddress.value = decryptedData['wallets'][0]['walletAddress'];
         isWhiteListed.value = decryptedData['wallets'][0]['chains'][0]['isWhitelisted'];
+
+       _logger.i("walletAddress.value===>${walletAddress.value}");
+
+        _logger.i("isWhiteListed.value===>${isWhiteListed.value}");
+        if (isWhiteListed.value == true || isWhiteListed.value == 'GREEN') {
+          _logger.i("✅ Entered isWhiteListed Verified Condition");
+          progressVal.value += 25;
+        } else {
+          _logger.i("❌ isWhiteListed is NOT GREEN/TRUE, no progress added.");
+        }
       } else {
         isLoading.value = false;
         throw ApiException("Failed to fetch properties.");
       }
+      _logger.i("Final progressVal: ${progressVal.value}");
+
     } catch (e) {
       isLoading.value = false;
       _logger.i("Error :--${e.toString()}");
@@ -322,15 +382,15 @@ class AccountVerificationController extends GetxController
             phoneNumber.value.replaceFirst(countryCodeNumber.value, "");
         countryCode = ValueNotifier(countryCodeNumber.value);
 
-        _logger.i("Phone verification Done");
+       _logger.i("Phone verification Done");
         return true;
       } else {
         isLoading.value = false;
-        _logger.i("Error during phone else");
+       _logger.i("Error during phone else");
       }
     } catch (e) {
       isLoading.value = false;
-      _logger.i("Error during phone verification: $e");
+     _logger.i("Error during phone verification: $e");
     } finally {
       isLoading.value = false;
     }
@@ -348,14 +408,14 @@ class AccountVerificationController extends GetxController
         verificationFailed: (error) {
           isLoading.value = false;
           if (error.code == 'quota-exceeded') {
-            _logger.i("Quota exceeded. Enable billing.");
+           _logger.i("Quota exceeded. Enable billing.");
           } else if (error.code == 'invalid-phone-number') {
             CustomWidgets.showError(
                 context: context, message: "Invalid phone number format.");
           } else {
             CustomWidgets.showError(
                 context: context, message: "Invalid phone number format.");
-            _logger.i("Unexpected error: ${error.code}");
+           _logger.i("Unexpected error: ${error.code}");
           }
         },
         codeSent: (verificationId, forceResendingToken) {
@@ -366,7 +426,7 @@ class AccountVerificationController extends GetxController
         codeAutoRetrievalTimeout: (String verificationId) {},
       );
     } catch (e) {
-      _logger.i("Error during phone verification: ${e.toString()}");
+     _logger.i("Error during phone verification: ${e.toString()}");
     }
   }
 
@@ -380,7 +440,7 @@ class AccountVerificationController extends GetxController
 
       await FirebaseAuth.instance.signInWithCredential(cred).then((value) {
         isLoading.value = false;
-        _logger.i("Successfull sign-in: ${value.user}");
+       _logger.i("Successfull sign-in: ${value.user}");
         Get.back();
         phoneVerificationAPi(
             Get.context!, phoneController.text, countryCode.value, true);
@@ -397,7 +457,7 @@ class AccountVerificationController extends GetxController
       });
     } catch (e) {
       isLoading.value = false;
-      _logger.i("Error during sign-in: ${e.toString()}");
+     _logger.i("Error during sign-in: ${e.toString()}");
       if (e is FirebaseAuthException) {
         if (e.code == 'invalid-verification-code') {
           Get.snackbar(
@@ -519,7 +579,7 @@ class AccountVerificationController extends GetxController
                       : ColorUtils.bottomBarLight,
                 ),
                 onChanged: (value) {
-                  // print("Pressed onComplte:-$value");
+                  // _logger.i("Pressed onComplte:-$value");
                   textPhoneNumber.value = value;
                   // phoneOtpRecivie(value);
                 },

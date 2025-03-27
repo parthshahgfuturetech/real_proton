@@ -79,5 +79,6 @@ class SharedPreferenceKey{
   static const loginToken = "loginToken";
   static const googleToken = "googleToken";
   static const createPin = "createPin";
+  static const walletAddress = "walletAddress";
 
 }

@@ -18,6 +18,7 @@ import 'package:real_proton/utils/theme.dart';
 import 'package:real_proton/utils/widgets.dart';
 
 import '../../create_your_pin_screen/create_your_pin_screen.dart';
+import '../wallet/wallet_controller.dart';
 
 class ProfileScreen extends StatelessWidget {
   ProfileScreen({super.key});
@@ -27,6 +28,7 @@ class ProfileScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final LoginController loginController = Get.put(LoginController());
     final ProfileController proController = Get.put(ProfileController());
+    final WalletController mWalletController = Get.put(WalletController());
     final ThemeController themeController = Get.find();
     final isDarkMode = themeController.themeMode.value == ThemeMode.dark ||
         (themeController.themeMode.value == ThemeMode.system &&
@@ -63,7 +65,7 @@ class ProfileScreen extends StatelessWidget {
                         : proController.profileAppSettingsLightImageLight,proController
                   ),
                   const SizedBox(height: 20),
-                  buildLogoutButton(context, loginController, proController),
+                  buildLogoutButton(context, loginController, proController,mWalletController),
                   SizedBox(
                       height: bottomBarController.kycPending.value ? 50 : 20),
                 ],
@@ -81,13 +83,14 @@ class ProfileScreen extends StatelessWidget {
   }
 
   Widget buildLogoutButton(
-      BuildContext context, loginController, ProfileController proController) {
+      BuildContext context, loginController, ProfileController proController,WalletController mWalletController) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 10),
       height: 50,
       width: double.infinity,
       child: ElevatedButton(
         onPressed: () {
+          mWalletController.logoutUser();
           proController.logOutMethod(context, loginController);
         },
         style: ElevatedButton.styleFrom(
@@ -151,13 +154,13 @@ class ProfileScreen extends StatelessWidget {
   void handleTap(String title,ProfileController prController) {
     if (title == "Account Verification") {
       Get.to(() => AccountVerificationScreen())!.then((value) {
-        print("hello accout$value");
-        profileController.walletAddress.value = value;
-        if(profileController.walletAddress.value.isNotEmpty){
-          bottomBarController.kycPending.value = false;
-          saleController.isShowButton.value = true;
-          walletController.isTransactionHistoryShow.value = true;
-        }
+        // print("hello accout$value");
+        // profileController.walletAddress.value = value;
+        // if(profileController.walletAddress.value.isNotEmpty){
+        //   bottomBarController.kycPending.value = false;
+        //   saleController.isShowButton.value = true;
+        //   walletController.isTransactionHistoryShow.value = true;
+        // }
       });
     } else if (title == "Change Password") {
       Get.to(() => ChangePasswordScreen());
@@ -678,7 +681,7 @@ class ProfileScreen extends StatelessWidget {
                 isDarkMode: isDarkMode),
             const SizedBox(height: 16),
             CustomWidgets.buildGetStartedButton(
-              onPressed: () {
+              onPressed: proController.updateDetailsBtn ? null:() {
                 proController.apiUserUpdate(Get.context!);
                 Get.back();
               },

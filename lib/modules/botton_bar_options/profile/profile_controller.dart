@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -37,11 +38,14 @@ class ProfileController extends GetxController {
   RxBool isLoading = false.obs;
   final ApiService apiServiceClass = ApiService();
   final ImagePicker _picker = ImagePicker();
-  bool permissionGranted = false,isEmailVerified = false,isPhoneVerified = false;
-
+  bool permissionGranted = false,
+      isEmailVerified = false,
+      isPhoneVerified = false;
+  bool updateDetailsBtn = false;
   @override
   void onInit() {
     super.onInit();
+
     apiSaveData();
   }
 
@@ -130,7 +134,7 @@ class ProfileController extends GetxController {
   Future<void> apiSaveData() async {
     try {
       isLoading.value = true;
-
+      print("profileController-apiSaveData:============");
       apiServiceClass.updateAuthorizationToken(
           SharedPreferencesUtil.getString(SharedPreferenceKey.loginToken) ??
               "");
@@ -150,11 +154,11 @@ class ProfileController extends GetxController {
         userImage.value = decryptedData['profile'] ?? '';
         isEmailVerified = decryptedData['isEmailVerified'] ?? '';
         isPhoneVerified = decryptedData['isPhoneVerified'] ?? '';
-        if(isEmailVerified && progress.value < 100){
-            progress.value += 25;
+        if (isEmailVerified && progress.value < 100) {
+          progress.value += 25;
         }
-        if(isPhoneVerified && progress.value < 100){
-            progress.value += 25;
+        if (isPhoneVerified && progress.value < 100) {
+          progress.value += 25;
         }
         firstNameController.text = firstName.value;
         lastNameController.text = lastName.value;
@@ -163,8 +167,12 @@ class ProfileController extends GetxController {
           walletAddress.value =
               decryptedData['wallets'][0]['walletAddress'] ?? '';
         }
+
         if (decryptedData['kycMetadata']['reviewResult']['reviewAnswer'] ==
             'GREEN') {
+          updateDetailsBtn = true;
+          progress.value += 25;
+
           bottomBarController.kycPending.value = false;
           saleController.isShowButton.value = true;
           walletController.isTransactionHistoryShow.value = true;
@@ -175,6 +183,13 @@ class ProfileController extends GetxController {
           bottomBarController.kycPending.value = true;
           saleController.isShowButton.value = false;
           walletController.isTransactionHistoryShow.value = false;
+        }
+
+        if (decryptedData['wallets'][0]['chains'][0]['isWhitelisted'] ==
+            false) {
+          bottomBarController.kycPending.value = true;
+        } else {
+          bottomBarController.kycPending.value = false;
         }
       } else {
         isLoading.value = false;
@@ -191,16 +206,27 @@ class ProfileController extends GetxController {
   Future<void> pickImage(BuildContext context) async {
     isLoading.value = true;
 
-    if (await requestPermission(Get.context!, Permission.storage)) {
+    bool hasPermission = await checkAndRequestPermissions(context);
+    print("Storage permission granted: $hasPermission");
+
+    if (hasPermission) {
       final XFile? imageFile =
           await _picker.pickImage(source: ImageSource.gallery);
+
       if (imageFile != null) {
         try {
           final response = await apiServiceClass.uploadImage(
               Get.context!, ApiUtils.updateUser, imageFile);
+
           if (response.statusCode == 200) {
+            final responseJson = response.data['data'];
+            String decryptedText = CustomWidgets.decryptOpenSSL(
+                responseJson, StringUtils.secretKey);
+            final Map<String, dynamic> decryptedData =
+                jsonDecode(decryptedText);
+            print("pickImage===>$decryptedData");
             _logger.i("API Successful");
-            userImage.value = response.data['data']['profile'];
+            userImage.value = decryptedData['profile'];
             Get.back();
           } else {
             _logger.i("API Failed");
@@ -211,13 +237,32 @@ class ProfileController extends GetxController {
       }
     } else {
       _logger.i("Gallery permission denied.");
+      CustomWidgets.showError(
+          context: Get.context!,
+          message: "Gallery permission denied. Please enable it in settings.");
+      openAppSettings(); // Open settings if permanently denied
     }
+
     isLoading.value = false;
+  }
+
+  Future<bool> checkAndRequestPermissions(BuildContext context) async {
+    if (Platform.isAndroid) {
+      bool hasStoragePermission =
+          await requestPermission(context, Permission.storage);
+      bool hasMediaPermission =
+          await requestPermission(context, Permission.photos);
+      return hasStoragePermission || hasMediaPermission;
+    } else if (Platform.isIOS) {
+      return await requestPermission(context, Permission.photos);
+    }
+    return false;
   }
 
   Future<bool> requestPermission(
       BuildContext context, Permission permission) async {
     final status = await permission.status;
+    print("Current permission status: $status");
 
     if (status.isGranted) {
       return true;
@@ -225,6 +270,7 @@ class ProfileController extends GetxController {
 
     if (status.isDenied) {
       final newStatus = await permission.request();
+      print("New permission status after request: $newStatus");
       if (newStatus.isGranted) {
         return true;
       } else {
@@ -291,14 +337,10 @@ class ProfileController extends GetxController {
 
       if (response.statusCode == 200) {
         await FirebaseAuth.instance.signOut();
-        // if (loginController.isGoogleLogin.value) {
-        //   await googleSignIn.signOut();
-        //   _logger.i("User signed out from Google");
-        //   await SharedPreferencesUtil.remove(SharedPreferenceKey.googleToken);
-        // } else {
+
         await SharedPreferencesUtil.remove(SharedPreferenceKey.loginToken);
         await SharedPreferencesUtil.clear();
-        // }
+
         await Future.delayed(Duration(seconds: 3));
         Get.delete<WalletController>();
         Get.delete<BottomBarController>();

@@ -17,7 +17,7 @@ CompleteAndFailScreen({required this.responseJson, Key? key}) : super(key: key);
   return Obx(
       ()=> Scaffold(
         body: SafeArea(
-          bottom: true,
+          top: false,
           minimum: EdgeInsets.only(bottom: 20),
           child:  completeAndFailController.isCompleteAndFail.value
                 ? buildComplete()
@@ -49,7 +49,7 @@ CompleteAndFailScreen({required this.responseJson, Key? key}) : super(key: key);
   }
 
   Widget buildComplete() {
-    String formattedDate = "N/A"; // Default value to prevent uninitialized error
+    String formattedDate = "N/A";
 
     int timestamp = responseJson['data']['updatedAt']; // Ensure it's an int
 
@@ -60,7 +60,7 @@ CompleteAndFailScreen({required this.responseJson, Key? key}) : super(key: key);
           "${date.day} ${CustomWidgets.getMonthName(date.month)} ${date.year}, "
           "${CustomWidgets.formatHour(date.hour)}:${CustomWidgets.formatMinute(date.minute)} ${CustomWidgets.getPeriod(date.hour)}";
 
-      print(formattedDate); // Check the output
+      print(formattedDate);
     } else {
       print("Invalid timestamp");
     }
@@ -126,7 +126,7 @@ CompleteAndFailScreen({required this.responseJson, Key? key}) : super(key: key);
               children: [
                 buildTransactionDetail("Amount", "\$${responseJson['data']['txnAmount']}"),
                 buildTransactionDetail("Expected RP Token", "${responseJson['data']['rpAmount']}"),
-                buildTransactionDetail("Transaction Id", "${responseJson['data']['paymentId']}"),
+                buildTransactionIdSet("Transaction Id", "${responseJson['data']['paymentId']}"),
                 buildTransactionDetail("Date & Time", formattedDate),
               ],
             ),
@@ -224,6 +224,20 @@ CompleteAndFailScreen({required this.responseJson, Key? key}) : super(key: key);
         children: [
           Text(title, style: TextStyle(color: ColorUtils.forgotPasswordTextDark,fontWeight: FontWeight.w400, fontSize: 14,fontFamily: "Switzer")),
           Text(value, style: TextStyle(fontSize: 14,fontFamily: "Switzer", fontWeight: FontWeight.w600, color: Colors.white)),
+        ],
+      ),
+    );
+
+  }
+
+  Widget buildTransactionIdSet(String title, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 5),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(title, style: TextStyle(color: ColorUtils.forgotPasswordTextDark,fontWeight: FontWeight.w400, fontSize: 14,fontFamily: "Switzer")),
+          Text(CustomWidgets.formatAddress(value), style: TextStyle(fontSize: 14,fontFamily: "Switzer", fontWeight: FontWeight.w600, color: Colors.white)),
         ],
       ),
     );

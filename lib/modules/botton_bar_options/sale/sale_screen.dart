@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:real_proton/main.dart';
 import 'package:real_proton/modules/botton_bar_options/sale/dropDownSale_screen.dart';
+import 'package:real_proton/modules/botton_bar_options/sale/sale_controller.dart';
 import 'package:real_proton/utils/colors.dart';
 import 'package:real_proton/utils/images.dart';
 import 'package:real_proton/utils/theme.dart';
@@ -10,6 +11,8 @@ import 'package:real_proton/utils/widgets.dart';
 
 class SaleScreen extends StatelessWidget {
   SaleScreen({super.key});
+  final SaleController mSaleController = Get.put(SaleController());
+
   final ThemeController themeController = Get.find();
   @override
   Widget build(BuildContext context) {
@@ -31,18 +34,29 @@ class SaleScreen extends StatelessWidget {
         child: Center(child: CustomWidgets.buildLoader()),
       );
     }
-          return Column(
-          children: [
-            const SizedBox(height: 20),
-            CustomizedDropdown(),
-            const SizedBox(height: 10),
-            buildUpArrowAndPrices(isDarkMode),
-            const Spacer(),
-            if (saleController.isShowButton.value)
-              buildSwipButton(buttonWidth, isDarkMode, toggleWidth),
-            const SizedBox(height: 20),
-          ],
-        );
+          return Stack(
+            children: [
+              Column(
+              children: [
+                const SizedBox(height: 20),
+                CustomizedDropdown(),
+                const SizedBox(height: 10),
+                buildUpArrowAndPrices(isDarkMode),
+                const Spacer(),
+                if (mSaleController.isShowButton.value)
+                  buildSwipButton(buttonWidth, isDarkMode, toggleWidth),
+                const SizedBox(height: 20),
+              ],
+                      ),
+              if (mSaleController.isLoading.value)
+                Positioned.fill(
+                  child: Container(
+                    color: Colors.black.withValues(alpha: 0.7),
+                    child: CustomWidgets.buildLoader(),
+                  ),
+                ),
+            ],
+          );
         },
       ),
     );
@@ -118,11 +132,24 @@ class SaleScreen extends StatelessWidget {
                 action: saleController.textController.text.isEmpty ? (value){
                   CustomWidgets.showInfo(context: Get.context!, message: "Enter Amount");
                 } :(controller) async {
-                  controller.loading();
-                    saleController.stripeApiCall();
-                  await Future.delayed(const Duration(seconds: 2));
-                  controller.success();
-                  controller.reset();
+                  controller.loading();  // Set loading state immediately
+
+                  await Future.delayed(Duration(milliseconds: 300)); // Give time for UI update
+
+                  saleController.stripeApiCall().then((_) {
+                    controller.success();  // Show success state after API call
+                  }).catchError((error) {
+                    controller.failure();  // Handle failure state
+                  }).whenComplete(() {
+                    controller.reset();  // Reset after completion
+                  });
+                  //
+                  // controller.loading();
+                  // saleController.stripeApiCall();
+                  // // await Future.delayed(const Duration(seconds: 2));
+                  // controller.success();
+                  // controller.reset();
+
                 },
               ),
             ),

@@ -5,6 +5,7 @@ import 'package:real_proton/modules/account_varify_screen/account_verifi_screen.
 import 'package:real_proton/modules/botton_bar_options/bottom_bar/bottomBarController.dart';
 import 'package:real_proton/modules/botton_bar_options/dashboard/dashboard_screen.dart';
 import 'package:real_proton/modules/botton_bar_options/explore/explore_screen.dart';
+import 'package:real_proton/modules/botton_bar_options/profile/profile_controller.dart';
 import 'package:real_proton/modules/botton_bar_options/profile/profile_screen.dart';
 import 'package:real_proton/modules/botton_bar_options/sale/sale_screen.dart';
 import 'package:real_proton/modules/botton_bar_options/wallet/wallet_screen.dart';
@@ -18,6 +19,7 @@ class BottomBar extends StatelessWidget {
   BottomBar({super.key});
 
   final ThemeController themeController = Get.find();
+  ProfileController mProfileController = Get.put(ProfileController());
 
   @override
   Widget build(BuildContext context) {
@@ -32,11 +34,13 @@ class BottomBar extends StatelessWidget {
             appBar: PreferredSize(
               preferredSize: const Size.fromHeight(kToolbarHeight),
               child: buildAppBar(context, isDarkMode),
+
             ),
             body: Stack(
               children: [
                 buildScreens(),
-                if (bottomBarController.kycPending.value) buildKycContainer(),
+                if (bottomBarController.kycPending.value)
+                  buildKycContainer(),
               ],
             ),
             bottomNavigationBar: Stack(
@@ -152,6 +156,7 @@ class BottomBar extends StatelessWidget {
       backgroundColor: const Color.fromRGBO(249, 86, 22, 0.25),
       scrolledUnderElevation: 0,
       leadingWidth: 200,
+      elevation: 0,
       leading: Stack(
         children: [
           Row(
@@ -208,7 +213,7 @@ class BottomBar extends StatelessWidget {
                       children: [
                         Flexible(
                           child: buildAppBarTitle(
-                              "${profileController.firstName.value} ${profileController.lastName.value}",
+                              "${mProfileController.firstName.value} ${mProfileController.lastName.value}",
                               isDarkMode),
                         ),
                         const SizedBox(width: 5),

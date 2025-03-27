@@ -20,7 +20,6 @@ class SignupScreen extends StatelessWidget {
         (themeController.themeMode.value == ThemeMode.system &&
             MediaQuery.of(context).platformBrightness == Brightness.dark);
     // signUpController.deviceInfo1();
-    bool isKeyboardVisible = MediaQuery.of(context).viewInsets.bottom > 0;
     return SafeArea(
       top: false,
       child: Scaffold(
@@ -52,18 +51,7 @@ class SignupScreen extends StatelessWidget {
                             ],
                           ),
                         ),
-                      ),
-                      // if (!isKeyboardVisible) ...[
-                      //   buildBasicDetailsFooterText(isDarkMode),
-                      //   SafeArea(
-                      //     child: CustomWidgets.buildGetStartedButton(
-                      //       onPressed: () {
-                      //         signUpController.signUp(context);
-                      //       },
-                      //       text: "Submit",
-                      //     ),
-                      //   ),
-                      // ],
+                      )
                     ],
                   ),
                   if (signUpController.isLoading.value)

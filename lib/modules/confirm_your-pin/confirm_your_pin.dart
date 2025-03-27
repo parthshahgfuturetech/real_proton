@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../../utils/colors.dart';
 import '../../utils/theme.dart';
 import 'confirm_your_pin_controller.dart';
@@ -78,7 +77,7 @@ class _ConfirmYourPinState extends State<ConfirmYourPin> {
 
             const Spacer(),
             buildContainerGradient(),
-            buildNumberPad(),
+            buildNumberPad(isDarkMode),
           ],
         ),
       ),
@@ -112,8 +111,7 @@ class _ConfirmYourPinState extends State<ConfirmYourPin> {
     );
   }
 
-  // ✅ Fixed: Connect the number pad with the correct controller
-  Widget buildNumberPad() {
+  Widget buildNumberPad(isDarkMode) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: Column(
@@ -129,7 +127,7 @@ class _ConfirmYourPinState extends State<ConfirmYourPin> {
               children: row.map((text) {
                 return text.isEmpty
                     ? const SizedBox(width: 92)
-                    : buildNumberButton(text);
+                    : buildNumberButton(text,isDarkMode);
               }).toList(),
             ),
         ],
@@ -137,16 +135,15 @@ class _ConfirmYourPinState extends State<ConfirmYourPin> {
     );
   }
 
-  Widget buildNumberButton(String text) {
+  Widget buildNumberButton(String text,isDarkMode) {
     return GestureDetector(
       onTap: () {
         if (text == '⌫') {
-          confirmYourPinController.deleteDigit(); // ✅ Delete digit from confirm PIN
+          confirmYourPinController.deleteDigit();
         } else {
-          confirmYourPinController.addDigit(text); // ✅ Add digit to confirm PIN
+          confirmYourPinController.addDigit(text);
         }
 
-        // ✅ Auto-verify when the PIN is fully entered
         if (confirmYourPinController.confirmPin.value.length == 4) {
           confirmYourPinController.verifyPin();
         }
@@ -167,7 +164,7 @@ class _ConfirmYourPinState extends State<ConfirmYourPin> {
           style: TextStyle(
             fontSize: 26,
             fontWeight: FontWeight.bold,
-            color: Colors.white,
+            color:isDarkMode? Colors.white:ColorUtils.blackColor,
           ),
         ),
       ),

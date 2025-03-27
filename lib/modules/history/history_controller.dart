@@ -100,7 +100,7 @@ class HistoryController extends GetxController {
       };
 
       final response = await apiService.get(
-          Get.context!, "https://api.realproton.com/v1/transaction/all",
+          Get.context!, ApiUtils.fetchTransactionApi,
           queryParameters: data);
 
       if (response.statusCode == 200) {

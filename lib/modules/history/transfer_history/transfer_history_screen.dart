@@ -332,7 +332,7 @@ class TransferHistoryScreen extends StatelessWidget {
               Flexible(
                   child: _buildTransactionDetail(
                       "Wallet",
-                      "0x504f1C1782221194C2cf09BC9620fCC3e6818C55asdsdasdasass",
+                      "${decryptedData['walletAddress']}",
                       isDarkMode)),
               const SizedBox(width: 8),
               GestureDetector(

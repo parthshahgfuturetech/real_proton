@@ -17,12 +17,7 @@ class WalletController extends GetxController {
   final Logger _logger = Logger();
   final ApiService apiService = ApiService();
 
-  // @override
-  // void onInit() {
-  //   // TODO: implement onInit
-  //   super.onInit();
-  //   fetchAssetsData();
-  // }
+
 
   @override
   void onReady() {
@@ -203,30 +198,34 @@ class WalletController extends GetxController {
     }
   }
 
-  Future<void> fetchAssetsData() async {
+  void fetchAssetsData() async {
     isLoading.value = true;
+    assets.clear();
     try {
-      final response =
-          await apiService.get(Get.context!, ApiUtils.walletAssetsData);
+      final response = await apiService.get(Get.context!, ApiUtils.walletAssetsData);
 
       if (response.statusCode == 200) {
-
         final responseJson = response.data['vault'];
         String decryptedText = CustomWidgets.decryptOpenSSL(responseJson, StringUtils.secretKey);
         final Map<String, dynamic> decryptedData = jsonDecode(decryptedText);
 
-        assets.addAll(decryptedData['assets']);
-        _logger.i("Api Successfully${decryptedData['assets']}");
+        assets.assignAll(decryptedData['assets'] ?? []);
+        _logger.i("fetchAssetsData Api Successfully${decryptedData['assets']}");
         updateTotalBalance();
       } else {
-        isLoading.value = false;
-        _logger.i("Error in Api:-");
+        _logger.i("Error in API");
       }
     } catch (e) {
-      isLoading.value = false;
-      _logger.i("Error in Api:-$e");
+      _logger.i("Error in API: $e");
     } finally {
       isLoading.value = false;
+      update();
     }
+  }
+
+  void logoutUser() {
+
+    assets.value = [];
+    _logger.i("User logged out. Cleared asset data.");
   }
 }

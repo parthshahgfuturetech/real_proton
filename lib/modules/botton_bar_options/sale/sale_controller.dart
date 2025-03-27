@@ -78,8 +78,14 @@ class SaleController extends GetxController {
 
           _logger.i("Api successful and Stripe api is Step 2");
 
-          await Stripe.instance.presentPaymentSheet().then((val){
-            stripeSuccessApi(idString);
+          await Stripe.instance.presentPaymentSheet().then((val) async {
+            textController.clear();
+            amount.value=0;
+            // await Future.delayed(Duration(milliseconds: 300)); // Give time for UI update
+            Future.delayed(const Duration(milliseconds: 50), () {
+              stripeSuccessApi(idString);();
+            });
+
           });
 
         } catch (e) {

@@ -3,7 +3,8 @@ class ApiUtils {
 
 
   /// Base URL
-  static const BASE_URL = "https://api.realproton.com";
+  // static const BASE_URL = "https://api.realproton.com";
+  static const BASE_URL = "http://3.145.102.4:3000";
   // static const BASE_URL = "http://192.168.1.9:3000";
 
   static const loginAPi = "$BASE_URL/v1/user-auth/login";
@@ -23,7 +24,14 @@ class ApiUtils {
   static const stripeAPi = "$BASE_URL/v1/stripe/payment_intents";
   static const stripeSuccessAPi = "$BASE_URL/v1/stripe/payment_intents/confirm";
   static const fiatDetailApi = "$BASE_URL/v1/fiat/user-fiat-transaction-detail";
+  static const kycUpdate = "$BASE_URL/v1/sumsub/applicant-status";
+  static const fetchTransactionApi = "$BASE_URL/v1/transaction/all";
+  static const rpcUrl = "$BASE_URL/v1/chain/";
+  static const chainDataApi = "$BASE_URL/v1/chain/";
   ///Graphql Apis.
+  ///
+  ///
+  /// https://api.realproton.com/v1/transaction/all
   static const transactionHistory = "https://api.studio.thegraph.com/query/89202/proton-token-3643-celo/version/latest";
 
 

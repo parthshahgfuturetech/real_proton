@@ -2,6 +2,7 @@ import 'package:country_code_picker/country_code_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:real_proton/modules/account_varify_screen/account_verifi_controller.dart';
+import 'package:real_proton/modules/botton_bar_options/profile/profile_controller.dart';
 import 'package:real_proton/modules/forgot_password_screen/send_email_box.dart';
 import 'package:real_proton/modules/kyc_screen/kyc_screen.dart';
 import 'package:real_proton/utils/colors.dart';
@@ -736,8 +737,11 @@ class AccountVerificationScreen extends StatelessWidget {
           color: isDarkMode ? Colors.white : ColorUtils.appbarBackgroundDark,
           size: 15,
         ),
-        onPressed: () =>
-            Get.back(result: accountController.walletAddress.value),
+        onPressed: () async {
+
+          Get.back(result: accountController.walletAddress.value);
+        }
+
       ),
     );
   }

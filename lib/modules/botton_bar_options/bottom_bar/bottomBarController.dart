@@ -2,14 +2,17 @@ import 'package:get/get.dart';
 import 'package:real_proton/main.dart';
 import 'package:real_proton/utils/images.dart';
 
+import '../wallet/wallet_controller.dart';
+
 class BottomBarController extends GetxController {
   RxInt currentIndex = 0.obs;
   RxBool kycPending = true.obs;
-
+  final WalletController mWalletController = Get.put(WalletController());
   @override
   void onInit() {
     super.onInit();
-    profileController.apiSaveData();
+    print("BottomBarController onInit called");  // Debug log
+
   }
 
   final List<String> titles = ["Home", "Explore", " ", "Wallet", "Profile"];

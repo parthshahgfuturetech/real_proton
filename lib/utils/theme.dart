@@ -6,10 +6,7 @@ enum AppThemeMode { light, dark, system }
 class ThemeController extends GetxController {
   var themeMode = ThemeMode.dark.obs;
 
-  // void setThemeMode(ThemeMode mode) {
-  //   themeMode.value = mode;
-  //   Get.changeThemeMode(mode);
-  // }
+
   @override
   void onInit() {
     super.onInit();

@@ -1,17 +1,18 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:real_proton/main.dart';
-import 'package:real_proton/modules/history/history_screen.dart';
-import 'package:real_proton/utils/colors.dart';
-import 'package:real_proton/utils/theme.dart';
-import 'package:real_proton/utils/widgets.dart';
+import 'package:real_proton/modules/botton_bar_options/wallet/transfer_fund__screen/transfer_fund_screen.dart';
+import 'package:real_proton/modules/botton_bar_options/wallet/wallet_controller.dart';
 
-import 'transfer_fund__screen/transfer_fund_screen.dart';
+import '../../../main.dart';
+import '../../../utils/colors.dart';
+import '../../../utils/shared_preference.dart';
+import '../../../utils/theme.dart';
+import '../../../utils/widgets.dart';
 
 class WalletScreen extends StatelessWidget {
-  WalletScreen({super.key});
-
+  final WalletController walletController = Get.put(WalletController());
   final ThemeController themeController = Get.find();
 
   @override
@@ -19,45 +20,95 @@ class WalletScreen extends StatelessWidget {
     final isDarkMode = themeController.themeMode.value == ThemeMode.dark ||
         (themeController.themeMode.value == ThemeMode.system &&
             MediaQuery.of(context).platformBrightness == Brightness.dark);
+    String? walletAddress =
+    SharedPreferencesUtil.getString(SharedPreferenceKey.walletAddress);
+    print("WalletScreen-walletAddress--->${walletAddress}");
     return Scaffold(
-      body: Obx(
-        () {
-          walletController.rpPrice.value = CustomWidgets.weiToRP(blockChainController.tokenPrice.value);
-          return Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                ColorUtils.dashBoardAppbar1,
-                ColorUtils.dashBoardAppbar2,
+      body: Obx(() {
+        if (walletController.isLoading.value) {
+             if (walletController.isLoading.value)
+               return Container(
+               color: Colors.black.withValues(alpha: 0.7),
+              child: CustomWidgets.buildLoader(),
+             );
+        }
+        walletController.rpPrice.value =
+            CustomWidgets.weiToRP(blockChainController.tokenPrice.value);
+        return SingleChildScrollView(
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  ColorUtils.dashBoardAppbar1,
+                  ColorUtils.dashBoardAppbar2,
+                ],
+              ),
+            ),
+            child: Column(
+              children: [
+                const SizedBox(
+                  height: 10,
+                ),
+                buildShowTotalBalance(context, isDarkMode),
+                Container(
+                  height: 20,
+                  margin: EdgeInsets.symmetric(horizontal: 33),
+                  color: const Color.fromRGBO(249, 86, 22, 0.16),
+                ),
+                buildAssetsText(isDarkMode),
+                Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 15),
+
+                decoration: BoxDecoration(              border:Border.all(
+                  color: isDarkMode
+                      ? ColorUtils.appbarHorizontalLineDark
+                      : ColorUtils.appbarHorizontalLineLight,
+                ),
+                  ),
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                    itemCount: walletController.assets.length,
+                    itemBuilder: (context, index) {
+                      var e = walletController.assets[index];
+
+                      if (walletController.assets.isEmpty) {
+                        return Center(child: Text("No assets available"));
+                      }
+                      double balance = double.parse("${e['balance']}");
+                      String balanceOf = balance.toStringAsFixed(2);
+                      return Container(
+                        decoration: BoxDecoration(
+                          color: isDarkMode
+                              ? ColorUtils.appbarBackgroundDark
+                              : ColorUtils.bottomBarLight,
+                          // Completely remove borders inside the list
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            buildAssetsMainData(
+                              image: e["id"] ?? "isEmpty",
+                              isDarkMode: isDarkMode,
+                              title1: e['id'] ?? "isEmpty",
+                              price1: e['id'] ?? "isEmpty",
+                              title2: "${balanceOf} ${walletController.buildSortNames(e['id'])}" ?? "isEmpty",
+                              price2: e['balance'] ?? "isEmpty",
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ),
+
               ],
             ),
           ),
-          child: Column(
-            children: [
-              const SizedBox(
-                height: 10,
-              ),
-              buildShowTotalBalance(context, isDarkMode),
-              Container(
-                height: 20,
-                margin: EdgeInsets.symmetric(horizontal: 33),
-                color: const Color.fromRGBO(249, 86, 22, 0.16),
-              ),
-              buildAssetsText(isDarkMode),
-              Expanded(child: buildAssets(isDarkMode)),
-              SizedBox(
-                height:
-                    walletController.isTransactionHistoryShow.value ? 10 : 35,
-              ),
-              if (walletController.isTransactionHistoryShow.value)
-                buildTransactionHistory(isDarkMode)
-            ],
-          ),
         );
-        },
-      ),
+      }),
     );
   }
 
@@ -72,85 +123,6 @@ class WalletScreen extends StatelessWidget {
           color: isDarkMode ? Colors.white : Colors.black,
           fontFamily: "Switzer",
           fontWeight: FontWeight.w500,
-        ),
-      ),
-    );
-  }
-
-  Widget buildTransactionHistory(bool isDarkMode) {
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTap: (){
-        Get.to(HistoryScreen("${profileController.firstName.value} ${profileController.lastName.value}"));
-      },
-      child: Container(
-        height: 55,
-        padding: const EdgeInsets.symmetric(horizontal: 15),
-        decoration: BoxDecoration(
-            color: isDarkMode
-                ? ColorUtils.transactionHistoryColor
-                : ColorUtils.whiteColor,
-            border: Border.all(
-              color: isDarkMode
-                  ? ColorUtils.appbarHorizontalLineDark
-                  : ColorUtils.appbarHorizontalLineLight,
-            )),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              "Transaction History",
-              style: TextStyle(
-                fontSize: 18,
-                color: isDarkMode
-                    ? ColorUtils.indicaterGreyLight
-                    : ColorUtils.appbarHorizontalLineDark,
-                fontFamily: "Switzer",
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            Icon(
-              Icons.arrow_forward,
-              size: 20,
-              color: isDarkMode
-                  ? ColorUtils.indicaterGreyLight
-                  : ColorUtils.blackColor,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget buildAssets(bool isDarkMode) {
-    return Obx(
-        ()=> SingleChildScrollView(
-        child: Container(
-          margin: const EdgeInsets.symmetric(horizontal: 15),
-          decoration: BoxDecoration(
-              color: isDarkMode
-                  ? ColorUtils.appbarBackgroundDark
-                  : ColorUtils.bottomBarLight,
-              border: Border.all(
-                color: isDarkMode
-                    ? ColorUtils.appbarHorizontalLineDark
-                    : ColorUtils.appbarHorizontalLineLight,
-              )),
-          child: Column(
-            children: walletController.assets.map(
-              (e) {
-                return buildAssetsMainData(
-                    image: e["id"] ?? "isEmpty",
-                    isDarkMode: isDarkMode,
-                    title1: e['id'] ?? "isEmpty",
-                    price1: e['id'] ?? "isEmpty",
-                    title2:
-                        "${e['balance']} ${walletController.buildSortNames(e['id'])} " ??
-                            "isEmpty",
-                    price2: e['balance'] ?? "isEmpty");
-              },
-            ).toList(),
-          ),
         ),
       ),
     );
@@ -186,8 +158,10 @@ class WalletScreen extends StatelessWidget {
                   CrossAxisAlignment.start),
             ],
           ),
-          buildAssetsData(isDarkMode, title2,
-              walletController.buildSortPrice2(double.parse(price2),title1),
+          buildAssetsData(
+              isDarkMode,
+              title2,
+              walletController.buildSortPrice2(double.parse(price2), title1),
               CrossAxisAlignment.end),
         ],
       ),

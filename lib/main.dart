@@ -81,19 +81,7 @@ class MyApp extends StatelessWidget {
     );
   }
 
-  Widget decideStartScreen() {
-    String? token =
-        SharedPreferencesUtil.getString(SharedPreferenceKey.loginToken);
-    String? googleToken =
-        SharedPreferencesUtil.getString(SharedPreferenceKey.googleToken);
 
-    if ((token != null && token.isNotEmpty) ||
-        (googleToken != null && googleToken.isNotEmpty)) {
-      return BottomBar();
-    } else {
-      return SplashScreen();
-    }
-  }
 }
 
 
