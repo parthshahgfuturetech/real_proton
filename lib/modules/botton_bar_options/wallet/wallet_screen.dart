@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:real_proton/main.dart';
+import 'package:real_proton/modules/history/history_screen.dart';
 import 'package:real_proton/utils/colors.dart';
 import 'package:real_proton/utils/theme.dart';
 import 'package:real_proton/utils/widgets.dart';
@@ -77,40 +78,46 @@ class WalletScreen extends StatelessWidget {
   }
 
   Widget buildTransactionHistory(bool isDarkMode) {
-    return Container(
-      height: 55,
-      padding: const EdgeInsets.symmetric(horizontal: 15),
-      decoration: BoxDecoration(
-          color: isDarkMode
-              ? ColorUtils.transactionHistoryColor
-              : ColorUtils.whiteColor,
-          border: Border.all(
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: (){
+        Get.to(HistoryScreen("${profileController.firstName.value} ${profileController.lastName.value}"));
+      },
+      child: Container(
+        height: 55,
+        padding: const EdgeInsets.symmetric(horizontal: 15),
+        decoration: BoxDecoration(
             color: isDarkMode
-                ? ColorUtils.appbarHorizontalLineDark
-                : ColorUtils.appbarHorizontalLineLight,
-          )),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            "Transaction History",
-            style: TextStyle(
-              fontSize: 18,
+                ? ColorUtils.transactionHistoryColor
+                : ColorUtils.whiteColor,
+            border: Border.all(
+              color: isDarkMode
+                  ? ColorUtils.appbarHorizontalLineDark
+                  : ColorUtils.appbarHorizontalLineLight,
+            )),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              "Transaction History",
+              style: TextStyle(
+                fontSize: 18,
+                color: isDarkMode
+                    ? ColorUtils.indicaterGreyLight
+                    : ColorUtils.appbarHorizontalLineDark,
+                fontFamily: "Switzer",
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            Icon(
+              Icons.arrow_forward,
+              size: 20,
               color: isDarkMode
                   ? ColorUtils.indicaterGreyLight
-                  : ColorUtils.appbarHorizontalLineDark,
-              fontFamily: "Switzer",
-              fontWeight: FontWeight.w500,
+                  : ColorUtils.blackColor,
             ),
-          ),
-          Icon(
-            Icons.arrow_forward,
-            size: 20,
-            color: isDarkMode
-                ? ColorUtils.indicaterGreyLight
-                : ColorUtils.blackColor,
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -240,7 +247,9 @@ class WalletScreen extends StatelessWidget {
               height: 10,
             ),
             buildButton(
-                onTap: () {},
+                onTap: () {
+                  bottomBarController.currentIndex.value = 2;
+                },
                 "Invest Now",
                 ColorUtils.loginButton,
                 Colors.white),
@@ -258,9 +267,10 @@ class WalletScreen extends StatelessWidget {
     return Row(
       children: [
         Expanded(
-            child: buildButton(onTap: () {
+            child: buildButton(onTap: walletController.totalValue.value == 0.0
+               ? (){} :() {
           Get.to(TransferFundsScreen());
-        }, "Transfer", Colors.white,
+        }, "Transfer", walletController.totalValue.value == 0.0 ?Colors.white.withAlpha(140) : Colors.white,
                 const Color.fromRGBO(255, 255, 255, 0.24))),
         const SizedBox(
           width: 10,
@@ -328,8 +338,8 @@ class WalletScreen extends StatelessWidget {
   }
 
   Widget buildPriceText(bool isDarkMode) {
-    return const Text(
-      "\$${0.0}",
+    return  Text(
+      "\$${walletController.totalValue.value.toStringAsFixed(2)}",
       style: TextStyle(
         fontSize: 32,
         fontWeight: FontWeight.w600,
@@ -411,109 +421,109 @@ class WalletScreen extends StatelessWidget {
       ),
       backgroundColor: Colors.black,
       builder: (_) {
-        return Container(
-          height: MediaQuery.of(context).size.height * 0.4,
-          decoration: BoxDecoration(
-            color: ColorUtils.appbarBackgroundDark,
-            border: const Border(
-                top: BorderSide(
-              color: ColorUtils.appbarHorizontalLineDark,
-            )),
-            borderRadius: BorderRadius.circular(15),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                margin:
-                    const EdgeInsets.symmetric(horizontal: 23, vertical: 15),
-                child: const Text(
-                  'Select Network',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
+        return Obx(
+            ()=> Container(
+            height: MediaQuery.of(context).size.height * 0.4,
+            decoration: BoxDecoration(
+              color: ColorUtils.appbarBackgroundDark,
+              border: const Border(
+                  top: BorderSide(
+                color: ColorUtils.appbarHorizontalLineDark,
+              )),
+              borderRadius: BorderRadius.circular(15),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  margin:
+                      const EdgeInsets.symmetric(horizontal: 23, vertical: 15),
+                  child: const Text(
+                    'Select Network',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
-              ),
-              Expanded(
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  scrollDirection: Axis.vertical,
-                  itemCount: walletController.networks.length,
-                  itemBuilder: (context, index) {
-                    final network = walletController.networks[index];
-                    return Column(
-                      children: [
-                        if (index == 0)
-                          const Divider(
-                            color: ColorUtils.appbarHorizontalLineDark,
-                            thickness: 1,
-                            height: 1,
-                          ),
-                        ListTile(
-                          leading: CircleAvatar(
-                            backgroundImage: AssetImage(network['icon']!),
-                          ),
-                          title: Text(
-                            network['name']!,
-                            style: const TextStyle(color: Colors.white),
-                          ),
-                          trailing: Container(
-                            height: 20,
-                            width: 20,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              border: Border.all(
+                Expanded(
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    scrollDirection: Axis.vertical,
+                    itemCount: walletController.networks.length,
+                    itemBuilder: (context, index) {
+                      final network = walletController.networks[index];
+                      return Column(
+                        children: [
+                          if (index == 0)
+                            const Divider(
+                              color: ColorUtils.appbarHorizontalLineDark,
+                              thickness: 1,
+                              height: 1,
+                            ),
+                          ListTile(
+                            leading: Image.network("${network['icon']}",height: 30,width: 30,),
+                            title: Text(
+                              network['name']!,
+                              style: const TextStyle(color: Colors.white),
+                            ),
+                            trailing: Container(
+                              height: 20,
+                              width: 20,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: walletController.selectedNetwork.value ==
+                                          network['name']
+                                      ? ColorUtils.loginButton
+                                      : Colors.grey,
+                                  width: walletController.selectedNetwork.value ==
+                                          network['name']
+                                      ? 6
+                                      : 1,
+                                ),
                                 color: walletController.selectedNetwork.value ==
                                         network['name']
-                                    ? Colors.orange
-                                    : Colors.grey,
-                                width: walletController.selectedNetwork.value ==
-                                        network['name']
-                                    ? 6
-                                    : 1,
+                                    ? Colors.black
+                                    : Colors.transparent,
                               ),
-                              color: walletController.selectedNetwork.value ==
+                              child: walletController.selectedNetwork.value ==
                                       network['name']
-                                  ? Colors.black
-                                  : Colors.transparent,
-                            ),
-                            child: walletController.selectedNetwork.value ==
-                                    network['name']
-                                ? Center(
-                                    child: Container(
-                                      height: 10,
-                                      width: 10,
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        color: isDarkMode
-                                            ? ColorUtils.whiteColor
-                                            : ColorUtils.blackColor,
+                                  ? Center(
+                                      child: Container(
+                                        height: 10,
+                                        width: 10,
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          color: isDarkMode
+                                              ? ColorUtils.whiteColor
+                                              : ColorUtils.blackColor,
+                                        ),
                                       ),
-                                    ),
-                                  )
-                                : null,
+                                    )
+                                  : null,
+                            ),
+                            onTap: () {
+                              walletController.selectedNetwork.value =
+                                  network['name']!;
+                              Get.back();
+                            },
                           ),
-                          onTap: () {
-                            walletController.selectedNetwork.value =
-                                network['name']!;
-                            Get.back();
-                          },
-                        ),
-                        if (index != walletController.networks.length - 1)
-                          const Divider(
-                            color: ColorUtils.appbarHorizontalLineDark,
-                            thickness: 1,
-                            height: 1,
-                          ),
-                      ],
-                    );
-                  },
+                          if (index != walletController.networks.length - 1)
+                            const Divider(
+                              color: ColorUtils.appbarHorizontalLineDark,
+                              thickness: 1,
+                              height: 1,
+                            ),
+                        ],
+                      );
+                    },
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         );
       },

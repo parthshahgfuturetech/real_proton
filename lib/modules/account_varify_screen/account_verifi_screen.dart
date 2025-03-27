@@ -109,22 +109,22 @@ class AccountVerificationScreen extends StatelessWidget {
                                                       "PhoneNumber is invalid");
                                               return;
                                             }
-                                            // bool isVerified =
-                                            //     await accountDetailsController
-                                            //         .phoneVerificationAPi(
-                                            //             context,
-                                            //             accountDetailsController
-                                            //                 .phoneController.text,
-                                            //             accountDetailsController
-                                            //                 .countryCode.value,
-                                            //             false);
-                                            // if (!isVerified) {
-                                            //   CustomWidgets.showError(
-                                            //       context: context,
-                                            //       message:
-                                            //           "Provided Mobile Number is Already Registered");
-                                            //   return;
-                                            // }
+                                            bool isVerified =
+                                                await accountDetailsController
+                                                    .phoneVerificationAPi(
+                                                        context,
+                                                        accountDetailsController
+                                                            .phoneController.text,
+                                                        accountDetailsController
+                                                            .countryCode.value,
+                                                        false);
+                                            if (!isVerified) {
+                                              CustomWidgets.showError(
+                                                  context: context,
+                                                  message:
+                                                      "Provided Mobile Number is Already Registered");
+                                              return;
+                                            }
 
                                             accountDetailsController.phoneSendOtp(
                                                 context, isDarkMode,

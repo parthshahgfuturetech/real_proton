@@ -234,7 +234,7 @@ class DashboardScreen extends StatelessWidget {
             width: double.infinity,
             child: ElevatedButton(
               onPressed: () {
-                // Get.to(LoginScreen());
+                bottomBarController.currentIndex.value = 2;
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: ColorUtils.loginButton,

@@ -51,7 +51,9 @@ class PropertyDetailsScreen extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(
                       horizontal: 15, vertical: 10),
                   child: CustomWidgets.buildGetStartedButton(
-                      onPressed: () {}, text: 'Invest Now'),
+                      onPressed: () {
+                        bottomBarController.currentIndex.value = 2;
+                      }, text: 'Invest Now'),
                 )
               ],
             ),

@@ -8,7 +8,7 @@ class TransferFundsController extends GetxController {
   var remarks = ''.obs;
   var maxBalance = 125.00.obs;
   var isSuccessAndFail = false.obs;
-  final TextEditingController textController = TextEditingController(text: 0.00.toString());
+  final TextEditingController textController = TextEditingController();
 
   // Example assets
   List<Map<String, String>> assets = [

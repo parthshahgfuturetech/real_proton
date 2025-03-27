@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:real_proton/main.dart';
 import 'package:real_proton/utils/colors.dart';
 import 'package:real_proton/utils/strings.dart';
 import 'package:real_proton/utils/theme.dart';
@@ -121,17 +122,15 @@ class TransferFundsScreen extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
         decoration: BoxDecoration(
           border: Border.all(
-              color: controller.selectedAsset.value.isEmpty
-                  ? ColorUtils.textFieldBorderColorDark
-                  : ColorUtils.loginButton),
+              color: ColorUtils.textFieldBorderColorDark),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              controller.selectedAsset.value.isEmpty
+              walletController.selected.value.isEmpty
                   ? "Select"
-                  : controller.selectedAsset.value,
+                  :  walletController.selected.value,
               style: TextStyle(
                   color: isDarkMode ? Colors.white : Colors.black),
             ),
@@ -160,7 +159,7 @@ class TransferFundsScreen extends StatelessWidget {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(1),
-          borderSide:  BorderSide(color: Colors.orange),
+          borderSide:  BorderSide(color: ColorUtils.loginButton),
         ),
         filled: true,
         fillColor: isDarkMode ? Colors.black : ColorUtils.whiteColor,
@@ -196,6 +195,7 @@ class TransferFundsScreen extends StatelessWidget {
                           : ColorUtils.textFieldBorderColorDark,
                     ),
                     decoration: const InputDecoration(
+                      hintText: "0.0",
                       contentPadding: EdgeInsets.only(bottom: 5),
                       border: InputBorder.none,
                     ),
@@ -320,22 +320,23 @@ class TransferFundsScreen extends StatelessWidget {
           decoration: BoxDecoration(
             color: isDarkMode ? ColorUtils.appbarBackgroundDark : ColorUtils.bottomBarLight,
             border: const Border(
-                top: BorderSide(
-              color: ColorUtils.appbarHorizontalLineDark,
-            )),
+              top: BorderSide(
+                color: ColorUtils.appbarHorizontalLineDark,
+              ),
+            ),
             borderRadius: BorderRadius.circular(15),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
+              // Title
               Container(
-                margin:
-                    const EdgeInsets.symmetric(horizontal: 23, vertical: 15),
+                margin: const EdgeInsets.symmetric(horizontal: 23, vertical: 15),
                 child: Text(
-                  'Select Network',
+                  'Select Assets',
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white :Colors.black,
+                    color: isDarkMode ? Colors.white : Colors.black,
                     fontSize: 18,
                     fontFamily: "Switzer",
                     fontWeight: FontWeight.bold,
@@ -347,27 +348,32 @@ class TransferFundsScreen extends StatelessWidget {
                 child: ListView.builder(
                   shrinkWrap: true,
                   scrollDirection: Axis.vertical,
-                  itemCount: controller.assets.length,
+                  itemCount: walletController.assets.length,
                   itemBuilder: (context, index) {
-                    final asset = controller.assets[index];
+                    final asset = walletController.assets[index];
+                    bool isSelected = walletController.selected.value
+                        == walletController.buildSortNames(asset['id']);
                     return Column(
                       children: [
                         if (index == 0)
                           Divider(
-                            color: isDarkMode ? ColorUtils.appbarHorizontalLineDark : ColorUtils.appbarHorizontalLineLight,
+                            color: isDarkMode
+                                ? ColorUtils.appbarHorizontalLineDark
+                                : ColorUtils.appbarHorizontalLineLight,
                             thickness: 1,
                             height: 1,
                           ),
                         ListTile(
-                          leading: CircleAvatar(
-                            backgroundImage: AssetImage(asset['icon']!),
-                          ),
+                          leading: Image.asset(walletController.buildSortImages(asset['id']),height: 30,width: 30,) ,
                           title: Text(
-                            asset['name']!,
+                            walletController.buildSortNames(asset['id']),
                             style: TextStyle(
                               fontWeight: FontWeight.w500,
-                                fontFamily: "Switzer",
-                                color: isDarkMode ? Colors.white : ColorUtils.appbarHorizontalLineDark),
+                              fontFamily: "Switzer",
+                              color: isDarkMode
+                                  ? Colors.white
+                                  : ColorUtils.appbarHorizontalLineDark,
+                            ),
                           ),
                           trailing: Container(
                             height: 20,
@@ -375,44 +381,37 @@ class TransferFundsScreen extends StatelessWidget {
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               border: Border.all(
-                                color: controller.selectedAsset.value ==
-                                        asset['name']!
-                                    ? Colors.orange
-                                    : Colors.grey,
-                                width: controller.selectedAsset.value ==
-                                        asset['name']!
-                                    ? 6
-                                    : 1,
+                                color: isSelected ? ColorUtils.loginButton : Colors.grey,
+                                width: isSelected ? 6 : 1,
                               ),
-                              color: controller.selectedAsset.value ==
-                                      asset['name']!
-                                  ? Colors.black
-                                  : Colors.transparent,
+                              color: isSelected ? Colors.black : Colors.transparent,
                             ),
-                            child:
-                                controller.selectedAsset.value == asset['name']!
-                                    ? Center(
-                                        child: Container(
-                                          height: 10,
-                                          width: 10,
-                                          decoration: BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            color: isDarkMode
-                                                ? ColorUtils.whiteColor
-                                                : ColorUtils.blackColor,
-                                          ),
-                                        ),
-                                      )
-                                    : null,
+                            child: isSelected
+                                ? Center(
+                              child: Container(
+                                height: 10,
+                                width: 10,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: isDarkMode
+                                      ? ColorUtils.whiteColor
+                                      : ColorUtils.blackColor,
+                                ),
+                              ),
+                            )
+                                : null,
                           ),
                           onTap: () {
-                            controller.selectedAsset.value = asset['name']!;
+                            walletController.selected.value
+                            = walletController.buildSortNames(asset['id']);
                             Get.back();
                           },
                         ),
-                        if (index != controller.assets.length - 1)
+                        if (index != walletController.assets.length - 1)
                           Divider(
-                            color: isDarkMode ? ColorUtils.appbarHorizontalLineDark : ColorUtils.appbarHorizontalLineLight,
+                            color: isDarkMode
+                                ? ColorUtils.appbarHorizontalLineDark
+                                : ColorUtils.appbarHorizontalLineLight,
                             thickness: 1,
                             height: 1,
                           ),
