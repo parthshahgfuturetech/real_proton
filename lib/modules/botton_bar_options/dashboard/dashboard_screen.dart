@@ -18,6 +18,7 @@ class DashboardScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     final isDarkMode = themeController.themeMode.value == ThemeMode.dark ||
         (themeController.themeMode.value == ThemeMode.system &&
             MediaQuery.of(context).platformBrightness == Brightness.dark);
@@ -160,13 +161,10 @@ class DashboardScreen extends StatelessWidget {
   }
 
   Widget buildTotalBalance(bool isDarkMode) {
-    print("-=-=->${blockChainController.userBalance.value}");
-    // print("-=-=->${blockChainController..value}");
 
     double amountPrice = CustomWidgets.weiToRP(blockChainController.userBalance.value);
     String usdAmount = CustomWidgets.rpToUSD(amountPrice);
 
-    print("-=-=->${usdAmount}");
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 20),

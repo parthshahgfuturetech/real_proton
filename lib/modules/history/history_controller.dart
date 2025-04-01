@@ -5,7 +5,6 @@ import 'package:logger/logger.dart';
 import 'package:real_proton/modules/api_services/api_services.dart';
 import 'package:real_proton/modules/history/transfer_history/transfer_history_screen.dart';
 import 'package:real_proton/utils/apis.dart';
-import 'package:real_proton/utils/graphql.dart';
 import 'package:real_proton/utils/strings.dart';
 import 'package:real_proton/utils/widgets.dart';
 
@@ -28,11 +27,7 @@ class HistoryController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    // if(activeTab.value ==0){
-    //   fetchTransactionData();
-    // }else{
-      fetchFiatData();
-    // }
+    fetchFiatData();
   }
 
   void toggleSelection(RxList<String> selectedList, String value) {
@@ -147,9 +142,8 @@ class HistoryController extends GetxController {
 
         String decryptedText = CustomWidgets.decryptOpenSSL(responseJson, StringUtils.secretKey);
         final Map<String, dynamic> decryptedData = jsonDecode(decryptedText);
-        // print("fetchFiatDetailData:==>>  $decryptedData");
+        print("fetchFiatDetailData:==>>  $decryptedData");
 
-        // print("-=-=>${decryptedData['status']}");
 
        if(decryptedData['status']=='complete'){
          isSuccessAndFailSellAndBuy.value = true;

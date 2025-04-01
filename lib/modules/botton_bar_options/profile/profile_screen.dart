@@ -17,15 +17,18 @@ import 'package:real_proton/utils/images.dart';
 import 'package:real_proton/utils/theme.dart';
 import 'package:real_proton/utils/widgets.dart';
 
+import '../../../utils/shared_preference.dart';
 import '../../create_your_pin_screen/create_your_pin_screen.dart';
 import '../wallet/wallet_controller.dart';
 
 class ProfileScreen extends StatelessWidget {
   ProfileScreen({super.key});
 
-
   @override
   Widget build(BuildContext context) {
+    String? walletAddress =
+        SharedPreferencesUtil.getString(SharedPreferenceKey.walletAddress);
+    print("ProfileScreen-walletAddress--->${walletAddress}");
     final LoginController loginController = Get.put(LoginController());
     final ProfileController proController = Get.put(ProfileController());
     final WalletController mWalletController = Get.put(WalletController());
@@ -49,23 +52,23 @@ class ProfileScreen extends StatelessWidget {
                   const SizedBox(height: 16),
                   buildSectionHeader('Account Information'),
                   buildAccountAndAppMainContainer(
-                    isDarkMode,
-                    proController.profileItems,
-                    isDarkMode
-                        ? proController.profileDarkImageDark
-                        : proController.profileLightImageLight,
-                    proController
-                  ),
+                      isDarkMode,
+                      proController.profileItems,
+                      isDarkMode
+                          ? proController.profileDarkImageDark
+                          : proController.profileLightImageLight,
+                      proController),
                   buildSectionHeader('App Settings'),
                   buildAccountAndAppMainContainer(
-                    isDarkMode,
-                    proController.profileAppSettingItems,
-                    isDarkMode
-                        ? proController.profileAppSettingsDarkImageDark
-                        : proController.profileAppSettingsLightImageLight,proController
-                  ),
+                      isDarkMode,
+                      proController.profileAppSettingItems,
+                      isDarkMode
+                          ? proController.profileAppSettingsDarkImageDark
+                          : proController.profileAppSettingsLightImageLight,
+                      proController),
                   const SizedBox(height: 20),
-                  buildLogoutButton(context, loginController, proController,mWalletController),
+                  buildLogoutButton(context, loginController, proController,
+                      mWalletController),
                   SizedBox(
                       height: bottomBarController.kycPending.value ? 50 : 20),
                 ],
@@ -82,8 +85,8 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget buildLogoutButton(
-      BuildContext context, loginController, ProfileController proController,WalletController mWalletController) {
+  Widget buildLogoutButton(BuildContext context, loginController,
+      ProfileController proController, WalletController mWalletController) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 10),
       height: 50,
@@ -114,11 +117,10 @@ class ProfileScreen extends StatelessWidget {
   }
 
   Widget buildAccountAndAppMainContainer(
-    bool isDarkMode,
-    List<Map<String, dynamic>> items,
-    List<String> imagePaths,
-      ProfileController prController
-  ) {
+      bool isDarkMode,
+      List<Map<String, dynamic>> items,
+      List<String> imagePaths,
+      ProfileController prController) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 15),
       padding: const EdgeInsets.symmetric(horizontal: 5),
@@ -143,7 +145,7 @@ class ProfileScreen extends StatelessWidget {
             imagePath: imagePath,
             isDarkMode: isDarkMode,
             onTap: () {
-              handleTap(item['title'],prController );
+              handleTap(item['title'], prController);
             },
           );
         }),
@@ -151,7 +153,7 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  void handleTap(String title,ProfileController prController) {
+  void handleTap(String title, ProfileController prController) {
     if (title == "Account Verification") {
       Get.to(() => AccountVerificationScreen())!.then((value) {
         // print("hello accout$value");
@@ -168,7 +170,7 @@ class ProfileScreen extends StatelessWidget {
       Get.to(() => AccountVerificationScreen());
     } else if (title == "Notification Setting") {
       Get.to(() => NotificationSettingsScreen());
-    }else if (title == "Security Settings") {
+    } else if (title == "Security Settings") {
       // Get.to(() => SecuritySettingsScreen());
       Get.to(() => CreateYourPinScreen());
     } else if (title == 'Appearance') {
@@ -178,7 +180,8 @@ class ProfileScreen extends StatelessWidget {
     } else if (title == 'Help & Support') {
       Get.to(() => HelpSupportScreen());
     } else if (title == 'Transaction History') {
-      Get.to(() => HistoryScreen("${prController.firstName.value} ${prController.lastName.value}"));
+      Get.to(() => HistoryScreen(
+          "${prController.firstName.value} ${prController.lastName.value}"));
     } else {
       Get.snackbar(
         "Action",
@@ -312,11 +315,14 @@ class ProfileScreen extends StatelessWidget {
                         : ColorUtils.appbarHorizontalLineDark,
                     fontSize: 16),
               ),
-              if (proController.walletAddress.value.isNotEmpty) ...[
+              if (SharedPreferencesUtil.getString(
+                      SharedPreferenceKey.walletAddress) !=
+                  null) ...[
                 Row(
                   children: [
                     Text(
-                      CustomWidgets.formatAddress(proController.walletAddress.value),
+                      // CustomWidgets.formatAddress(proController.walletAddress.value),
+                      "${CustomWidgets.formatAddress(SharedPreferencesUtil.getString(SharedPreferenceKey.walletAddress).toString())}",
                       style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w400,
@@ -442,8 +448,9 @@ class ProfileScreen extends StatelessWidget {
                               return SafeArea(
                                 child: Padding(
                                   padding: EdgeInsets.only(
-                                    bottom:
-                                        MediaQuery.of(context).viewInsets.bottom,
+                                    bottom: MediaQuery.of(context)
+                                        .viewInsets
+                                        .bottom,
                                   ),
                                   child: buildEditDetailsBottomSheet(
                                       isDarkMode, proController),
@@ -681,10 +688,12 @@ class ProfileScreen extends StatelessWidget {
                 isDarkMode: isDarkMode),
             const SizedBox(height: 16),
             CustomWidgets.buildGetStartedButton(
-              onPressed: proController.updateDetailsBtn ? null:() {
-                proController.apiUserUpdate(Get.context!);
-                Get.back();
-              },
+              onPressed: proController.updateDetailsBtn
+                  ? null
+                  : () {
+                      proController.apiUserUpdate(Get.context!);
+                      Get.back();
+                    },
               text: 'Update Details',
             ),
           ],

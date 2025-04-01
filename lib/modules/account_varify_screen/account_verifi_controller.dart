@@ -13,7 +13,6 @@ import 'package:real_proton/utils/colors.dart';
 import 'package:real_proton/utils/shared_preference.dart';
 import 'package:real_proton/utils/strings.dart';
 import 'package:real_proton/utils/widgets.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class AccountVerificationController extends GetxController
     with WidgetsBindingObserver {
@@ -184,7 +183,7 @@ class AccountVerificationController extends GetxController
     try {
       final response = await apiServiceClass
           .post(Get.context!, ApiUtils.createWallet, data: data);
-      if (response.statusCode == 200) {
+      if (response.statusCode == 201) {
 
         _logger.i("createWalletApi===>${response.data['vault']['walletAddress']}");
         String walletAddress = response.data['vault']['walletAddress'];

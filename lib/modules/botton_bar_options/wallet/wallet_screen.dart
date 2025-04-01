@@ -7,22 +7,20 @@ import 'package:real_proton/modules/botton_bar_options/wallet/wallet_controller.
 
 import '../../../main.dart';
 import '../../../utils/colors.dart';
-import '../../../utils/shared_preference.dart';
+
 import '../../../utils/theme.dart';
 import '../../../utils/widgets.dart';
+
 
 class WalletScreen extends StatelessWidget {
   final WalletController walletController = Get.put(WalletController());
   final ThemeController themeController = Get.find();
-
+  // final BlockChainController mBlockChainController = Get.put();
   @override
   Widget build(BuildContext context) {
     final isDarkMode = themeController.themeMode.value == ThemeMode.dark ||
         (themeController.themeMode.value == ThemeMode.system &&
             MediaQuery.of(context).platformBrightness == Brightness.dark);
-    String? walletAddress =
-    SharedPreferencesUtil.getString(SharedPreferenceKey.walletAddress);
-    print("WalletScreen-walletAddress--->${walletAddress}");
     return Scaffold(
       body: Obx(() {
         if (walletController.isLoading.value) {
@@ -32,8 +30,6 @@ class WalletScreen extends StatelessWidget {
               child: CustomWidgets.buildLoader(),
              );
         }
-        walletController.rpPrice.value =
-            CustomWidgets.weiToRP(blockChainController.tokenPrice.value);
         return SingleChildScrollView(
           child: Container(
             decoration: BoxDecoration(
@@ -480,8 +476,15 @@ class WalletScreen extends StatelessWidget {
                                   : null,
                             ),
                             onTap: () {
-                              walletController.selectedNetwork.value =
-                                  network['name']!;
+                              String selectedNetwork = network['name']!;
+
+                              walletController.selectedNetwork.value = network['name']!;
+                              blockChainController.updateNetwork(selectedNetwork); // Call updateNetwork
+                              walletController.chainId = network['id'] ?? "";
+                              // Print selected values
+                              print("WalletController selectedNetwork: ${walletController.selectedNetwork.value}");
+                              print("BlockChainController selectedNetwork: ${blockChainController.selectedNetwork.value}");
+
                               Get.back();
                             },
                           ),

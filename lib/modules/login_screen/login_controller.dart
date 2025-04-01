@@ -1,7 +1,10 @@
+import 'dart:convert';
+import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
 import 'package:real_proton/main.dart';
 import 'package:real_proton/modules/botton_bar_options/bottom_bar/bottomBarController.dart';
@@ -11,6 +14,8 @@ import 'package:real_proton/utils/apis.dart';
 import 'package:real_proton/modules/api_services/api_services.dart';
 import 'package:real_proton/utils/shared_preference.dart';
 import 'package:real_proton/utils/widgets.dart';
+
+import '../location_get/location_controller.dart';
 
 class LoginController extends GetxController {
   final emailController = TextEditingController();
@@ -23,6 +28,7 @@ class LoginController extends GetxController {
   String phoneNumber = "";
   String countryCodeNumber = "";
   bool isVerifiedEmail = false;
+  final LocationController locationController = Get.put(LocationController());
 
   @override
   void dispose() {
@@ -43,21 +49,7 @@ class LoginController extends GetxController {
     isPasswordShow.value = !isPasswordShow.value;
   }
 
-  // Future<void> fetchUserDetails() async {
-  //   try {
-  //     final response = await apiServiceClass.get(Get.context!, ApiUtils.userDetails);
-  //     if (response.statusCode == 200) {
-  //       emailId = response.data['email'];
-  //       phoneNumber = response.data['mobileNumber'];
-  //       isVerifiedEmail = response.data['isEmailVerified'];
-  //       countryCodeNumber = response.data['countryCode'];
-  //     } else {
-  //       throw ApiException("Failed to fetch properties.");
-  //     }
-  //   } catch (e) {
-  //     _logger.i("Error :--${e.toString()}");
-  //   }
-  // }
+
 
   Future<UserCredential?> logInWithGoogle(BuildContext context) async {
     final FirebaseAuth auth = FirebaseAuth.instance;
@@ -138,15 +130,29 @@ class LoginController extends GetxController {
 
     isLoading.value = true;
     isGoogleLogin.value = false;
+
+
+    await locationController.getCurrentLocation();
+    double lat = locationController.latitude.value;
+    double lng = locationController.longitude.value;
+    _logger.i("User Location => Lat: $lat, Lng: $lng");
+
+
+    String ipAddress = await getPublicIpAddress();
+    _logger.i("User IP: $ipAddress");
+
+
     FocusScope.of(context).unfocus();
     final loginData = {
       "email": email,
       "password": password,
-      "ipAddress":'49.37.24.116',
-      "lat":'33',
-      "long":'49.37',
-      "os":'windows',
+      "ipAddress":'${ipAddress}',
+      "lat":'$lat',
+      "long":'$lng',
+      "os":'${Platform.isAndroid ? 'android' : Platform.isIOS ? 'ios' : 'unknown'}',
     };
+    _logger.i("Login Request Data: $loginData");
+
     try {
       final response = await apiServiceClass.post(context, ApiUtils.loginAPi,
           data: loginData);
@@ -179,5 +185,18 @@ class LoginController extends GetxController {
     } finally {
       isLoading.value = false;
     }
+  }
+
+  Future<String> getPublicIpAddress() async {
+    try {
+      final response = await http.get(Uri.parse('https://api64.ipify.org?format=json'));
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        return data['ip'];  // Returns public IP address
+      }
+    } catch (e) {
+      print("Failed to get public IP: $e");
+    }
+    return "Unknown IP";
   }
 }

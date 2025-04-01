@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:real_proton/modules/botton_bar_options/wallet/transfer_fund__screen/transfer_fund_controller.dart';
+import 'package:real_proton/modules/botton_bar_options/wallet/wallet_controller.dart';
 import 'package:real_proton/utils/colors.dart';
 import 'package:real_proton/utils/images.dart';
 import 'package:real_proton/utils/theme.dart';
@@ -10,7 +11,7 @@ class TransferFundsSuccessAndFailScreen extends StatelessWidget {
   TransferFundsSuccessAndFailScreen({super.key});
 
   final ThemeController themeController = Get.find();
-  final TransferFundsController controller = Get.put(TransferFundsController());
+  final WalletController controller = Get.put(WalletController());
 
   @override
   Widget build(BuildContext context) {

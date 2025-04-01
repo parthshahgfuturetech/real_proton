@@ -1,6 +1,8 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:lottie/lottie.dart';
 import 'package:real_proton/main.dart';
@@ -363,5 +365,16 @@ class CustomWidgets {
     );
   }
 
-
+  Future<String> getPublicIpAddress() async {
+    try {
+      final response = await http.get(Uri.parse('https://api64.ipify.org?format=json'));
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        return data['ip'];  // Returns public IP address
+      }
+    } catch (e) {
+      print("Failed to get public IP: $e");
+    }
+    return "Unknown IP";
+  }
 }

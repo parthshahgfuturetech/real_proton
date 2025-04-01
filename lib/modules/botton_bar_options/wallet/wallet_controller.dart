@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:logger/logger.dart';
 import 'package:real_proton/main.dart';
@@ -10,19 +11,35 @@ import 'package:real_proton/utils/widgets.dart';
 class WalletController extends GetxController {
   RxBool isBalanceShow = false.obs,
       isTransactionHistoryShow = false.obs,
-      isLoading = false.obs;
-  RxString selectedNetwork = 'isEmpty'.obs,selected = ''.obs;
-  RxDouble rpPrice= 0.0.obs,totalValue = 0.0.obs;
+      isLoading = false.obs,isSuccessAndFail = false.obs;
+  RxString selectedNetwork = 'isEmpty'.obs,selected = ''.obs,
+      walletAddress = ''.obs, remarks = ''.obs;
+  RxDouble rpPrice= 0.0.obs,totalValue = 0.0.obs,
+      transferAmount = 0.0.obs,maxBalance = 125.00.obs;
   RxList assets = [].obs;
+  TextEditingController textController = TextEditingController();
   final Logger _logger = Logger();
   final ApiService apiService = ApiService();
+  var chainId;
+  var balance=0.0;
+  var assetId="";
+  bool chainFound = false;
+  bool walletFound = false;
 
-
+  // @override
+  // void onReady() {
+  //   // TODO: implement onReady
+  //   super.onReady();
+  //   fetchChainData();
+  //   fetchAssetsData();
+  // }
 
   @override
-  void onReady() {
-    // TODO: implement onReady
-    super.onReady();
+  void onInit() {
+    // TODO: implement onInit
+    super.onInit();
+    rpPrice.value =
+        CustomWidgets.weiToRP(blockChainController.tokenPrice.value);
     fetchChainData();
     fetchAssetsData();
   }
@@ -113,14 +130,14 @@ class WalletController extends GetxController {
       case 'AVAXTEST':
         return (0*balance).toStringAsFixed(2);
       default:
-        return 'UnKnowName';
+        return '0.0';
     }
   }
 
   double calculateTotalPrice() {
     double total = 0.0;
 
-    for (var asset in walletController.assets) {
+    for (var asset in assets) {
       String id = asset['id'];
       double balance = double.tryParse(asset['balance'].toString()) ?? 0.0;
 
@@ -180,9 +197,11 @@ class WalletController extends GetxController {
         if (decryptedData.isNotEmpty) {
           networks.assignAll(decryptedData.map((item) => {
             'name': item['chainName'].toString(),
-            'icon': item['iconUrl'].toString()
-          }));
+            'icon': item['iconUrl'].toString(),
+            'id':item['_id'].toString()
 
+          }));
+          chainId=networks.firstOrNull?['id']?? "";
           selectedNetwork.value = networks.firstOrNull?['name'] ?? selectedNetwork.value;
         }
 
@@ -200,7 +219,7 @@ class WalletController extends GetxController {
 
   void fetchAssetsData() async {
     isLoading.value = true;
-    assets.clear();
+    // assets.clear();
     try {
       final response = await apiService.get(Get.context!, ApiUtils.walletAssetsData);
 
@@ -211,7 +230,9 @@ class WalletController extends GetxController {
 
         assets.assignAll(decryptedData['assets'] ?? []);
         _logger.i("fetchAssetsData Api Successfully${decryptedData['assets']}");
-        updateTotalBalance();
+        await Future.delayed(Duration(seconds: 1), () {
+          updateTotalBalance();
+        });
       } else {
         _logger.i("Error in API");
       }
@@ -223,9 +244,146 @@ class WalletController extends GetxController {
     }
   }
 
+
+  Future<void> getAllAddressApi({required String walletsAddress}) async{
+    isLoading.value = true;
+
+    try{
+
+      final response = await apiService.get(Get.context!,ApiUtils.allWalletsApi);
+
+      if(response.statusCode == 200){
+        final responseJson = response.data['data'];
+        String decryptedText = CustomWidgets.decryptOpenSSL(responseJson, StringUtils.secretKey);
+        final List<dynamic> decryptedData = jsonDecode(decryptedText);
+             var getData=decryptedData[0]['chains'][0]['chainId'];
+             print("getAllAddressApi-getData-----> $getData");
+             print("getAllAddressApi-decryptedData-----> $decryptedData");
+        // decryptedData[0]['chains'][0]['isWhitelisted']
+        for (var data in decryptedData) {
+          if (data['walletAddress'] == walletsAddress) {
+            print('Wallet Address found:---- $walletsAddress');
+            walletFound = true;
+            if (data['chains'] != null && data['chains'] is List && data['chains'].isNotEmpty) {
+              bool isWhitelisted = data['chains'][0]['isWhitelisted'] ?? false; // Default to false if null
+
+              if (isWhitelisted) {
+                print("Whitelisted: Yes");
+                transferTokenApi(walletsAddress);
+
+              } else {
+                CustomWidgets.showInfo(context: Get.context!, message: "wallet Address not whitlisted ");
+
+              }
+            } else {
+              print("⚠️ No chains data available");
+            }
+            break;
+          }
+        }
+
+        if (!walletFound) {
+          CustomWidgets.showInfo(context: Get.context!, message: "Wallet Address not found");
+        }
+
+        for (var data in decryptedData) {
+          var chains = data['chains'];
+          if (chains != null) {
+            for (var chain in chains) {
+              if (chain['chainId'] == chainId) {
+                print('Chain ID found:----- $chainId');
+                chainFound = true;
+                break;
+              }
+            }
+            if (chainFound) break;
+          }
+        }
+
+        if (!chainFound) {
+          CustomWidgets.showInfo(context: Get.context!, message: "Chain ID not found");
+        }
+        print("-=-=>$decryptedData");
+
+      }else{
+        isLoading.value = false;
+        _logger.i("Error");
+      }
+    }catch(e){
+      _logger.i("Error:-$e");
+      isLoading.value = false;
+    }finally{
+      isLoading.value = false;
+    }
+  }
+
+  void transferTokenApi(String walletsAddress) async {
+    isLoading.value = true;
+    // assets.clear();
+
+    try {
+      final data = {
+        "amount": textController.text,  // Ensure correct usage
+        "note": "${remarks.value}",
+        "assetId": "$assetId",
+        "externalAddress": "$walletsAddress",
+        "sourceVaultId": profileController.vaultId
+      };
+
+      _logger.i("API Request: POST ${ApiUtils.tranferTokenApi}");
+      _logger.i("Request Body: ${jsonEncode(data)}");
+
+      final response = await apiService.post(Get.context!, ApiUtils.tranferTokenApi, data: data);
+      _logger.i("Raw Response: ${response.toString()}");
+
+      if (response.statusCode == 200 && response.data != null) {
+        _logger.i("API Response Data: ${jsonEncode(response.data)}");
+
+        try {
+          final responseJson = response.data['vault'];
+          if (responseJson != null) {
+            String decryptedText = CustomWidgets.decryptOpenSSL(responseJson, StringUtils.secretKey);
+            final Map<String, dynamic> decryptedData = jsonDecode(decryptedText);
+
+            if (decryptedData.containsKey('assets')) {
+              assets.addAll(decryptedData['assets']);
+              _logger.i("fetchAssetsData API Successful: ${decryptedData['assets']}");
+            } else {
+              _logger.w("Decrypted response missing 'assets' key");
+            }
+          } else {
+            _logger.w("Response JSON is null");
+          }
+        } catch (decryptionError) {
+          _logger.e("Decryption Error: $decryptionError");
+        }
+      } else {
+        _logger.e("Error in API Response: ${response.statusCode} - ${response.data}");
+      }
+    } catch (e, stackTrace) {
+      _logger.e("Exception in API: $e\nStackTrace: $stackTrace");
+    } finally {
+      isLoading.value = false;
+      update();
+    }
+  }
+
+
+
+
+
+
   void logoutUser() {
 
     assets.value = [];
     _logger.i("User logged out. Cleared asset data.");
   }
+
+  double calculateTotalAmount(TextEditingController controller, String assetPrice) {
+    print("controller----$controller $assetPrice");
+    double inputValue = double.tryParse(controller.text) ?? 0.0;
+    double assetValue = double.tryParse(assetPrice) ?? 0.0;
+    return inputValue * assetValue;
+  }
+
 }

@@ -31,6 +31,7 @@ class ProfileController extends GetxController {
       walletAddress = ''.obs,
       phoneNumber = ''.obs;
   String kycReviewAnswer = '';
+  int vaultId = 0;
   List walletList = [];
   final TextEditingController firstNameController = TextEditingController();
   final TextEditingController lastNameController = TextEditingController();
@@ -154,6 +155,7 @@ class ProfileController extends GetxController {
         userImage.value = decryptedData['profile'] ?? '';
         isEmailVerified = decryptedData['isEmailVerified'] ?? '';
         isPhoneVerified = decryptedData['isPhoneVerified'] ?? '';
+        vaultId = decryptedData['wallets'][0]['vaultID'] ?? 0;
         if (isEmailVerified && progress.value < 100) {
           progress.value += 25;
         }
@@ -166,6 +168,8 @@ class ProfileController extends GetxController {
         if (walletList.isNotEmpty) {
           walletAddress.value =
               decryptedData['wallets'][0]['walletAddress'] ?? '';
+          await SharedPreferencesUtil.setString('walletAddress',  walletAddress.value);
+          _logger.i("walletAddress===>${walletAddress}");
         }
 
         if (decryptedData['kycMetadata']['reviewResult']['reviewAnswer'] ==
