@@ -7,7 +7,6 @@ import 'package:real_proton/utils/strings.dart';
 import 'package:real_proton/utils/theme.dart';
 
 import '../../../../utils/widgets.dart';
-import 'transfer_fund_controller.dart';
 import 'transfer_fund_success_and_fail_screen.dart';
 
 class TransferFundsScreen extends StatelessWidget {

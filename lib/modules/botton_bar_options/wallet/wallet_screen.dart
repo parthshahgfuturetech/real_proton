@@ -4,6 +4,8 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:real_proton/modules/botton_bar_options/wallet/transfer_fund__screen/transfer_fund_screen.dart';
 import 'package:real_proton/modules/botton_bar_options/wallet/wallet_controller.dart';
+import 'package:real_proton/utils/images.dart';
+import 'package:real_proton/utils/strings.dart';
 
 import '../../../main.dart';
 import '../../../utils/colors.dart';
@@ -297,7 +299,7 @@ class WalletScreen extends StatelessWidget {
                 ClipboardData(text: profileController.walletAddress.value));
           },
           child: Image.asset(
-            "assets/images/copy-img.png",
+            ImageUtils.copyImg,
             height: 18,
             width: 18,
             fit: BoxFit.fill,
@@ -323,7 +325,7 @@ class WalletScreen extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         const Text(
-          "Total Balance",
+          StringUtils.totalBalance,
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w500,
@@ -410,7 +412,7 @@ class WalletScreen extends StatelessWidget {
                   margin:
                       const EdgeInsets.symmetric(horizontal: 23, vertical: 15),
                   child: const Text(
-                    'Select Network',
+                    StringUtils.selectNetwork,
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 18,

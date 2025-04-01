@@ -8,7 +8,6 @@ import 'package:real_proton/modules/blockChain/blockChain_controller.dart';
 import 'package:real_proton/modules/botton_bar_options/bottom_bar/bottomBarController.dart';
 import 'package:real_proton/modules/botton_bar_options/profile/profile_controller.dart';
 import 'package:real_proton/modules/botton_bar_options/sale/sale_controller.dart';
-import 'package:real_proton/modules/botton_bar_options/wallet/transfer_fund__screen/transfer_fund_controller.dart';
 import 'package:real_proton/modules/botton_bar_options/wallet/wallet_controller.dart';
 import 'package:real_proton/modules/complete_and_fail/complete_and_fail_controller.dart';
 import 'package:real_proton/modules/property_details/property_details_controller.dart';
@@ -24,8 +23,6 @@ final SaleController saleController = Get.put(SaleController());
 final CompleteAndFailController completeAndFailController =
     Get.put(CompleteAndFailController());
 final WalletController walletController = Get.put(WalletController());
-final TransferFundsController transferFundController =
-    Get.put(TransferFundsController());
 final PropertyDetailsController propertyDetailsController =
     Get.put(PropertyDetailsController());
 final BlockChainController blockChainController = Get.put(BlockChainController());

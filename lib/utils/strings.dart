@@ -27,7 +27,8 @@ class StringUtils{
   static const addresTitle = 'Residence Inn by Marriott';
   static const errorMessage = 'Your profile verification was unsuccessful. For assistance, please contact support for assistance.';
   static const longText = "The Residence Inn San Marcos is the newest hospitality venue in the area, completed in 2022...The Residence Inn San Marcos is the newest hospitality venue in the area, completed in 2022...The Residence Inn San Marcos is the newest hospitality venue in the area, completed in 2022...The Residence Inn San Marcos is the newest hospitality venue in the area, completed in 2022...The Residence Inn San Marcos is the newest hospitality venue in the area, completed in 2022...";
-
+  static const totalBalance = "Total Balance";
+  static const selectNetwork = 'Select Network';
 
 
 

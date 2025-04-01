@@ -10,7 +10,7 @@ import 'package:real_proton/utils/apis.dart';
 import 'package:real_proton/utils/widgets.dart';
 
 class SaleController extends GetxController {
-  RxString selectedCurrency = 'USDT'.obs, selectedToken = 'RP'.obs;
+  RxString selectedCurrency = 'USD'.obs, selectedToken = 'RP'.obs;
   RxDouble usdtBalance = 123.00.obs,
       rpBalance = 125.00.obs,
       amount = 0.00.obs,rePrice = 0.0.obs;

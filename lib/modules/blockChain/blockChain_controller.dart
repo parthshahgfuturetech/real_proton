@@ -5,11 +5,9 @@ import 'package:http/http.dart' as http;
 import 'package:web3dart/web3dart.dart';
 import 'package:flutter/services.dart';
 
-import '../../Models/coin_model.dart';
-
 class BlockChainController extends GetxController {
   late Web3Client _client;
-  var coins = <Crypto>[].obs;  // List of coins
+  // var coins = <Crypto>[].obs;  // List of coins
   var isLoading = true.obs;  // Loading state
   var errorMessage = ''.obs;  // Error message
 
@@ -111,12 +109,12 @@ class BlockChainController extends GetxController {
         },
       );
 
-      if (response.statusCode == 200) {
-        Payload payload = Payload.fromJson(json.decode(response.body));
-        coins.value = payload.data;  // Update the coins list
-      } else {
-        errorMessage('Failed to load data');  // Set error message
-      }
+      // if (response.statusCode == 200) {
+      //   Payload payload = Payload.fromJson(json.decode(response.body));
+      //   coins.value = payload.data;  // Update the coins list
+      // } else {
+      //   errorMessage('Failed to load data');  // Set error message
+      // }
     } catch (e) {
       errorMessage('Error: $e');  // Catch and display any error
     } finally {

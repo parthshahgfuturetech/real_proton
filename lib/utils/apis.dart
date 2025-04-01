@@ -3,8 +3,8 @@ class ApiUtils {
 
 
   /// Base URL
-  // static const BASE_URL = "https://api.realproton.com";
-  static const BASE_URL = "http://3.145.102.4:3000";
+  static const BASE_URL = "https://api.realproton.com";
+  // static const BASE_URL = "http://3.145.102.4:3000";
   // static const BASE_URL = "http://192.168.1.9:3000";
 
   static const loginAPi = "$BASE_URL/v1/user-auth/login";

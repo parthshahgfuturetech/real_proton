@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:real_proton/main.dart';
-import 'package:real_proton/modules/botton_bar_options/wallet/transfer_fund__screen/transfer_fund_controller.dart';
 import 'package:real_proton/modules/history/history_controller.dart';
 import 'package:real_proton/utils/colors.dart';
 import 'package:real_proton/utils/images.dart';
@@ -11,7 +9,7 @@ import 'package:real_proton/utils/widgets.dart';
 
 class TransferHistoryScreen extends StatelessWidget {
   final Map<String, dynamic> decryptedData;
-  final String firstName; // Make sure it's explicitly typed
+  final String firstName;
 
   TransferHistoryScreen({
     required this.decryptedData,
@@ -23,8 +21,6 @@ class TransferHistoryScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print("TransferHistoryScreen decryptedData==: $decryptedData $firstName"); // Debugging line
-
     final isDarkMode = themeController.themeMode.value == ThemeMode.dark ||
         (themeController.themeMode.value == ThemeMode.system &&
             MediaQuery.of(context).platformBrightness == Brightness.dark);

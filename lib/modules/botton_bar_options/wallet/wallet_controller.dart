@@ -203,6 +203,8 @@ class WalletController extends GetxController {
           }));
           chainId=networks.firstOrNull?['id']?? "";
           selectedNetwork.value = networks.firstOrNull?['name'] ?? selectedNetwork.value;
+          chainId = networks.firstOrNull?['id'] ?? "";
+
         }
 
       }else{

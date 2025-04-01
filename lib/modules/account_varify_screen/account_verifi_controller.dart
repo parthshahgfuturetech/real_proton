@@ -176,6 +176,7 @@ class AccountVerificationController extends GetxController
   }
 
   Future<void> createWalletApi() async {
+    isLoading.value = true;
     final data = {
       "assetId": assetsId,
       "chainId": chainId
@@ -186,16 +187,21 @@ class AccountVerificationController extends GetxController
       if (response.statusCode == 201) {
 
         _logger.i("createWalletApi===>${response.data['vault']['walletAddress']}");
-        String walletAddress = response.data['vault']['walletAddress'];
-        await SharedPreferencesUtil.setString('walletAddress', walletAddress);
-        _logger.i("walletAddress===>${walletAddress}");
+        walletAddress.value = response.data['vault']['walletAddress'];
+        // String walletAddress = response.data['vault']['walletAddress'];
+        // await SharedPreferencesUtil.setString('walletAddress', walletAddress);
+        // _logger.i("walletAddress===>${walletAddress}");
 
        _logger.i("Successfully Create Wallet Address");
       } else {
+        isLoading.value = false;
        _logger.i("Error during Create Wallet Address");
       }
     } catch (e) {
+      isLoading.value = false;
      _logger.i("Error during Create Wallet Address");
+    }finally{
+      isLoading.value = false;
     }
   }
 
@@ -256,7 +262,6 @@ class AccountVerificationController extends GetxController
         isVerifiedEmail.value = decryptedData['isEmailVerified'];
         isPhoneNumberVerified.value = decryptedData['isPhoneVerified'];
         _logger.i("After assignment: isVerifiedEmail=${isVerifiedEmail.value}, isPhoneNumberVerified=${isPhoneNumberVerified.value}");
-
 
 
         if (isVerifiedEmail.value) {

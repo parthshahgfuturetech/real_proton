@@ -61,11 +61,13 @@ class ForgotPasswordController extends GetxController {
           buildShowDialogBox(context);
         });
       } else {
+        isLoading.value = false;
         CustomWidgets.showError(
             context: context,
             message: response.data['message'] ?? "Email send failed");
       }
     }catch(e){
+      isLoading.value = false;
       CustomWidgets.showError(
           context: context, message: "An error occurred: $e");
     }finally{
